@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-
-'''
-@Author: my name
-@Date: 2020-05-13 21:49:10
-@LastEditTime: 2020-05-13 22:16:44
-@LastEditors: Please set LastEditors
-@Description: In User Settings Edit
-@FilePath: Main_window.py
-'''
+#coding=utf-8
 from __future__ import with_statement
 import numpy as np
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
-from UI_window import Ui_MainWindow
+from ui_window import Ui_MainWindow
 import os
 import matplotlib.pyplot as plt
 from pylab import *

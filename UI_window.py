@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'haca12.26.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
+#coding=utf-8
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QWidget, QToolTip, QPushButton, QApplication)
 from PyQt5.QtGui import QFont
@@ -22,7 +15,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("主窗口")
         font = QtGui.QFont()
         font.setFamily("宋体")
-        font.setPointSize(18)
+        font.setPointSize(15)
         QToolTip.setFont(QFont('SansSerif', 14)) # 显示提示语setFont
         self.startButton = QtWidgets.QPushButton(self.centralwidget)
         self.startButton.setGeometry(QtCore.QRect(1010, 30, 110, 45))
@@ -37,8 +30,8 @@ class Ui_MainWindow(object):
         self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
         self.textEdit.setGeometry(QtCore.QRect(1010, 480, 241, 181))
         font = QtGui.QFont()
-        font.setFamily("黑体")
-        font.setPointSize(8)
+        font.setFamily("宋体")
+        font.setPointSize(10)
         self.textEdit.setFont(font)
         self.textEdit.setObjectName("textEdit")
         self.mpl = MplWidget(self.centralwidget)
@@ -79,7 +72,8 @@ class Ui_MainWindow(object):
         self.tableWidget.setSizePolicy(sizePolicy)
         self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
-        font.setFamily("黑体")
+        font.setFamily("宋体")
+        font.setPointSize(10)
         self.tableWidget.setFont(font)
         self.tableWidget.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.tableWidget.setAutoFillBackground(False)
@@ -243,7 +237,7 @@ class Ui_MainWindow(object):
         self.action6.setText(_translate("MainWindow", "6"))
         self.action7.setText(_translate("MainWindow", "7"))
 
-from mplwidget import MplWidget
+from mpl_widget import MplWidget
 import sys
 
 if __name__ == "__main__":
