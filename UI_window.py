@@ -2,6 +2,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QWidget, QToolTip, QPushButton, QApplication)
 from PyQt5.QtGui import QFont
+from image_draw import MplWidget
+from image_draw import DrawPicture
+import sys
+import numpy as np
+import pyqtgraph as pg
+from pyqtgraph.Point import Point
+from matplotlib.figure import Figure
 
 class Ui_MainWindow(object):
     def __init__(self):
@@ -34,6 +41,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.textEdit.setFont(font)
         self.textEdit.setObjectName("textEdit")
+        # 设置图像显示界面
         self.mpl = MplWidget(self.centralwidget)
         self.mpl.setEnabled(True)
         self.mpl.setGeometry(QtCore.QRect(21, 21, 971, 531))
@@ -43,7 +51,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.mpl.sizePolicy().hasHeightForWidth())
         self.mpl.setSizePolicy(sizePolicy)
         self.mpl.setMinimumSize(QtCore.QSize(0, 400))
-        self.mpl.setObjectName("绘图窗口")
+        self.mpl.setObjectName("图像显示界面")
         self.textBrowser_3 = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser_3.setGeometry(QtCore.QRect(500, 580, 81, 31))
         self.textBrowser_3.setObjectName("textBrowser_3")
@@ -237,9 +245,7 @@ class Ui_MainWindow(object):
         self.action6.setText(_translate("MainWindow", "6"))
         self.action7.setText(_translate("MainWindow", "7"))
 
-from mpl_widget import MplWidget
-import sys
-
+# 用于测试界面
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     mplMainWindow = QtWidgets.QMainWindow()

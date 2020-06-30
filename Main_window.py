@@ -8,13 +8,15 @@ import os
 import matplotlib.pyplot as plt
 from pylab import *
 from PyQt5.QtWidgets import QMessageBox
+import sys
 import time
 import asyncio
 
 class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         # 主窗口继承
-        super(DesignerMainWindow, self).__init__(parent)               
+        super(DesignerMainWindow, self).__init__(parent) 
+        self.setWindowTitle("波形显示界面")              
         self.setupUi(self)
         # 主界面上的按钮触发开始与停止采集函数的进程
         self.startButton.clicked.connect(self.startButton_callback)
@@ -43,12 +45,10 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.button_Browse.setEnabled(False)
 
     def QT_callback(self):
-
         # 设置帮助菜单中的关于QT的信息介绍
         QMessageBox.aboutQt(self, 'About QT')
 
     def PYQT_callback(self):
-
         # 设置帮助菜单中的关于PYQT的信息介绍
         QMessageBox.about(self, 'About PYQT5', '<p><p style="text-align:justify; ' 
             + ' font-family:&quot;font-size:16px;background-color:#FFFFFF; '
@@ -61,7 +61,6 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             + ' <a class="reference external" href="https://www.riverbankcomputing.com/commercial/buy">here</a>.</p></p>')
 
     def ZJU_callback(self):
-
         # 设置帮助菜单中的关于浙江大学的信息介绍
         QMessageBox.about(self, 'About ZJU', '<p>866 Yuhangtang Rd, Hangzhou 310058, P.R. China&nbsp;</p><p>Copyright &copy; '
             + ' 2018 <a href="http://www.zju.edu.cn/" target="_blank">Zhejiang University</a>&nbsp;</p><p>Seeking Truth, Pursuing Innovation.</p>')
@@ -83,17 +82,15 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
 
-
-import sys
-
+# 主程序
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    t = QtCore.QElapsedTimer()
-    t.start()
+    # t = QtCore.QElapsedTimer()
+    # t.start()
     splash = QtWidgets.QSplashScreen(QtGui.QPixmap("logo.jpg"))
-    while t.elapsed() < 1000:
-        splash.show()
-    splash.finish(splash)
+    # while t.elapsed() < 1000:
+    #     splash.show()
+    # splash.finish(splash)
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
     sys.exit(app.exec_())
