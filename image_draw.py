@@ -13,11 +13,20 @@ import sys
 # 主体界面显示
 win = pg.GraphicsLayoutWidget(show=False)
 win.setWindowTitle('wave display')
+# 显示鼠标坐标
+label = pg.LabelItem(justify='right')
+win.addItem(label)
 # 添加两个画图界面：上图p1，下图p2
 p1 = win.addPlot(row=1, col=0)
 p2 = win.addPlot(row=2, col=0)
 # 添加下图选区
 region = pg.LinearRegionItem()
+# 显示鼠标十字线
+vLine = pg.InfiniteLine(angle=90, movable=False)
+hLine = pg.InfiniteLine(angle=0, movable=False)
+# 添加随机数据
+data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+vb = p1.vb
 
 # matplotlib画布基类
 class MplCanvas(FigureCanvas):
@@ -49,16 +58,46 @@ class DrawPicture(object):
 
     # 显示鼠标十字线
     def mouseMoved(evt):
-        print(10)
         pos = evt[0]
         if p1.sceneBoundingRect().contains(pos):
             mousePoint = vb.mapSceneToView(pos)
-            print(mousePoint)
+            # print(mousePoint)
             index = int(mousePoint.x())
             if index > 0 and index < len(data1):
-                label.setText("<span style='font-size: 12pt'>x=%0.1f,   <span style='color: red'>y1=%0.1f</span>,   <span style='color: green'>y2=%0.1f</span>" % (mousePoint.x(), data1[index], data2[index]))
+                label.setText("<span style='font-size: 12pt'>x=%0.1f,   <span style='color: red'>y1=%0.1f</span>" % (mousePoint.x(), data1[index]))
+                label.setPos(mousePoint.x(), mousePoint.y())
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
+
+# 单个画布
+# 添加pyqtgraph画布
+class MplWidget(QtWidgets.QWidget):
+    def __init__(self, parent = None):
+        QtWidgets.QWidget.__init__(self, parent)
+        # 添加layout用于pyqtgraph绘制
+        layout = QtWidgets.QGridLayout()
+        self.setLayout(layout)
+        # 进行下图选区
+        region.setZValue(10)
+        p2.addItem(region, ignoreBounds=True)
+        p1.setAutoVisible(y=True)
+        p1.plot(data1, pen="r")
+        p2.plot(data1, pen="w")
+        # 设置选区初始范围
+        region.setRegion([100, 200])
+        minX, maxX = region.getRegion()
+        p1.setXRange(minX, maxX, padding=0)
+        # 移动下图选区改变上图
+        region.sigRegionChanged.connect(DrawPicture.update)
+        # 移动上图改变下图选区
+        p1.sigRangeChanged.connect(DrawPicture.updateRegion)
+        # 添加鼠标十字线
+        p1.addItem(vLine, ignoreBounds=True)
+        p1.addItem(hLine, ignoreBounds=True)
+        # 十字线跟随鼠标移动
+        proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
+        p1.proxy = proxy
+        layout.addWidget(win)
 
 # 单个画布
 # 添加matplotlib画布
@@ -70,81 +109,39 @@ class DrawPicture(object):
         # self.vbl.addWidget(self.canvas)
         # self.setLayout(self.vbl)
 
-# 单个画布
-# 添加pyqtgraph画布
-class MplWidget(QtWidgets.QWidget):
-    def __init__(self, parent = None):
-        QtWidgets.QWidget.__init__(self, parent)
-        # 添加layout用于pyqtgraph绘制
-        layout = QtWidgets.QGridLayout()
-        self.setLayout(layout)
-        # 显示鼠标坐标
-        label = pg.LabelItem(justify='right')
-        win.addItem(label)
-        # 进行下图选区
-        region.setZValue(10)
-        p2.addItem(region, ignoreBounds=True)
-        p1.setAutoVisible(y=True)
-        # 设置选区初始范围
-        region.setRegion([1000, 2000])  
-        # 添加随机数据
-        data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-        data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-        p1.plot(data1, pen="r")
-        p1.plot(data2, pen="g")
-        p2.plot(data1, pen="w")
-        # 初始化设置选区范围
-        minX, maxX = region.getRegion()
-        p1.setXRange(minX, maxX, padding=0)
-        # 移动下图选区改变上图
-        region.sigRegionChanged.connect(DrawPicture.update)
-        # 移动上图改变下图选区
-        p1.sigRangeChanged.connect(DrawPicture.updateRegion)
-        # 显示鼠标十字线
-        vLine = pg.InfiniteLine(angle=90, movable=False)
-        hLine = pg.InfiniteLine(angle=0, movable=False)
-        vLine.setPos(0)
-        hLine.setPos(0)
-        p1.addItem(vLine, ignoreBounds=True)
-        p1.addItem(hLine, ignoreBounds=True)
-        vb = p1.vb
-        proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
-
-        layout.addWidget(win)
-
-# 用于测试绘图
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    # 主体界面显示，上图p1，下图p2
-    win = pg.GraphicsLayoutWidget(show=True)
-    win.setWindowTitle('wave display')
-    # 显示鼠标坐标
-    label = pg.LabelItem(justify='right')
-    win.addItem(label)
-    # 添加两个画图界面
-    p1 = win.addPlot(row=1, col=0)
-    p2 = win.addPlot(row=2, col=0)
-    # 进行下图选区
-    region = pg.LinearRegionItem()
-    region.setZValue(10)
-    p2.addItem(region, ignoreBounds=True)
-    p1.setAutoVisible(y=True)
-    # 添加随机数据
-    data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-    data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-    p1.plot(data1, pen="r")
-    p1.plot(data2, pen="g")
-    p2.plot(data1, pen="w")
-    # 由下图选区更新上图
-    region.sigRegionChanged.connect(DrawPicture.update)
-    p1.sigRangeChanged.connect(DrawPicture.updateRegion)
-    # 设置选区初始范围
-    region.setRegion([1000, 2000])
-    # 显示鼠标十字线
-    vLine = pg.InfiniteLine(angle=90, movable=False)
-    hLine = pg.InfiniteLine(angle=0, movable=False)
-    p1.addItem(vLine, ignoreBounds=True)
-    p1.addItem(hLine, ignoreBounds=True)
-    vb = p1.vb
-    proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
-    sys.exit(app.exec_())
+# # 用于测试绘图
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     # 主体界面显示，上图p1，下图p2
+#     win = pg.GraphicsLayoutWidget(show=True)
+#     win.setWindowTitle('wave display')
+#     # 显示鼠标坐标
+#     label = pg.LabelItem(justify='right')
+#     win.addItem(label)
+#     # 添加两个画图界面
+#     p1 = win.addPlot(row=1, col=0)
+#     p2 = win.addPlot(row=2, col=0)
+#     # 进行下图选区
+#     region = pg.LinearRegionItem()
+#     region.setZValue(10)
+#     p2.addItem(region, ignoreBounds=True)
+#     p1.setAutoVisible(y=True)
+#     # 添加随机数据
+#     data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
+#     data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
+#     p1.plot(data1, pen="r")
+#     p1.plot(data2, pen="g")
+#     p2.plot(data1, pen="w")
+#     # 由下图选区更新上图
+#     region.sigRegionChanged.connect(DrawPicture.update)
+#     p1.sigRangeChanged.connect(DrawPicture.updateRegion)
+#     # 设置选区初始范围
+#     region.setRegion([1000, 2000])
+#     # 显示鼠标十字线
+#     vLine = pg.InfiniteLine(angle=90, movable=False)
+#     hLine = pg.InfiniteLine(angle=0, movable=False)
+#     p1.addItem(vLine, ignoreBounds=True)
+#     p1.addItem(hLine, ignoreBounds=True)
+#     vb = p1.vb
+#     proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
+#     sys.exit(app.exec_())
