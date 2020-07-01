@@ -101,7 +101,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.button_Browse.setFont(font)
         self.button_Browse.setObjectName("选择目录")
-        self.button_Browse.setToolTip('按下这个按钮，进行<b>文件目录选择</b>！你可以在此选择波形信号文件绘制其图像。')
+        self.button_Browse.setToolTip('按下这个按钮，进行<b>文件目录选择</b>。你可以在此选择波形信号文件绘制其图像。')
         self.line_Directory = QtWidgets.QLineEdit(self.centralwidget)
         self.line_Directory.setGeometry(QtCore.QRect(1010, 90, 150, 30))
         self.line_Directory.setObjectName("显示目录")

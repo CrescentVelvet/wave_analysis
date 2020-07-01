@@ -85,12 +85,12 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 # 主程序
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    # t = QtCore.QElapsedTimer()
-    # t.start()
+    t = QtCore.QElapsedTimer()
+    t.start()
     splash = QtWidgets.QSplashScreen(QtGui.QPixmap("logo.jpg"))
-    # while t.elapsed() < 1000:
-    #     splash.show()
-    # splash.finish(splash)
+    while t.elapsed() < 1000:
+        splash.show()
+    splash.finish(splash)
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
     sys.exit(app.exec_())
