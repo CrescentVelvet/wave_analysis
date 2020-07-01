@@ -9,15 +9,14 @@ import pyqtgraph as pg
 from pyqtgraph.Point import Point
 import sys
 
-# 主体界面显示，上图p1，下图p2
+# 为了在ui_window里调用，使用了全局变量
+# 主体界面显示
 win = pg.GraphicsLayoutWidget(show=False)
 win.setWindowTitle('wave display')
-# 显示鼠标坐标
-label = pg.LabelItem(justify='right')
-win.addItem(label)
-# 添加两个画图界面
+# 添加两个画图界面：上图p1，下图p2
 p1 = win.addPlot(row=1, col=0)
 p2 = win.addPlot(row=2, col=0)
+# 添加下图选区
 region = pg.LinearRegionItem()
 
 # matplotlib画布基类
@@ -37,19 +36,20 @@ class MplCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
 class DrawPicture(object):
-    # 由下图选区更新上图
+    # 移动下图选区改变上图
     def update():
         region.setZValue(10)
         minX, maxX = region.getRegion()
         p1.setXRange(minX, maxX, padding=0)
 
-    # 由下图选区更新上图
+    # 移动上图改变下图选区
     def updateRegion(window, viewRange):
         rgn = viewRange[0]
         region.setRegion(rgn)
 
-    # 显示鼠标当前坐标
+    # 显示鼠标十字线
     def mouseMoved(evt):
+        print(10)
         pos = evt[0]
         if p1.sceneBoundingRect().contains(pos):
             mousePoint = vb.mapSceneToView(pos)
@@ -61,22 +61,26 @@ class DrawPicture(object):
             hLine.setPos(mousePoint.y())
 
 # 单个画布
+# 添加matplotlib画布
 # class MplWidget(QtWidgets.QWidget):
 #     def __init__(self, parent = None):
 #         QtWidgets.QWidget.__init__(self, parent)
-        # 添加matplotlib画布
         # self.canvas = MplCanvas()
         # self.vbl = QtWidgets.QVBoxLayout()
         # self.vbl.addWidget(self.canvas)
         # self.setLayout(self.vbl)
 
 # 单个画布
+# 添加pyqtgraph画布
 class MplWidget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         QtWidgets.QWidget.__init__(self, parent)
-        # 添加pyqtgraph画布
+        # 添加layout用于pyqtgraph绘制
         layout = QtWidgets.QGridLayout()
         self.setLayout(layout)
+        # 显示鼠标坐标
+        label = pg.LabelItem(justify='right')
+        win.addItem(label)
         # 进行下图选区
         region.setZValue(10)
         p2.addItem(region, ignoreBounds=True)
@@ -89,16 +93,22 @@ class MplWidget(QtWidgets.QWidget):
         p1.plot(data1, pen="r")
         p1.plot(data2, pen="g")
         p2.plot(data1, pen="w")
-        # 由下图选区更新上图
+        # 初始化设置选区范围
+        minX, maxX = region.getRegion()
+        p1.setXRange(minX, maxX, padding=0)
+        # 移动下图选区改变上图
         region.sigRegionChanged.connect(DrawPicture.update)
-        # p1.sigRangeChanged.connect(DrawPicture.updateRegion)  
+        # 移动上图改变下图选区
+        p1.sigRangeChanged.connect(DrawPicture.updateRegion)
         # 显示鼠标十字线
         vLine = pg.InfiniteLine(angle=90, movable=False)
         hLine = pg.InfiniteLine(angle=0, movable=False)
+        vLine.setPos(0)
+        hLine.setPos(0)
         p1.addItem(vLine, ignoreBounds=True)
         p1.addItem(hLine, ignoreBounds=True)
         vb = p1.vb
-        # proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
+        proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
 
         layout.addWidget(win)
 
