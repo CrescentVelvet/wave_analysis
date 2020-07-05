@@ -11,6 +11,8 @@ from PyQt5.QtWidgets import QMessageBox
 import sys
 import time
 import asyncio
+import threading
+import queue
 
 class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -82,6 +84,25 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
 
+class my_threading(threading.Thread):
+    def __init__(self, ID, name, counter):
+        threading.Thread.__init__(self)
+        self.ID = ID
+        self.name = name
+        self.counter = counter
+    def run(self):
+        print ("开始线程：" + self.name)
+        process_data(self.ID,self.name, self.counter)
+        print ("退出线程：" + self.name)
+
+def process_data(id, name, counter):
+    while not thread_flag:
+        id += 1
+        if id >= 4:
+            data = counter.get()
+            print ("%s processing %s" % (name, data))
+        time.sleep(1)
+
 # 主程序
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
@@ -93,4 +114,25 @@ if __name__ == '__main__':
     splash.finish(splash)
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
+    
+    thread_flag = 0
+    thread_list = ["draw_pictures", "collect_data", "analy_data"]
+    number = ["One", "Two", "Three", "Four", "Five"]
+    work_queue = queue.Queue(10)
+    threads = []
+    thread_ID = 1
+    for num in number:
+        work_queue.put(num)
+    for thread_name in thread_list:
+        thread = my_threading(thread_ID, thread_name, work_queue)
+        thread.start()
+        threads.append(thread)
+        thread_ID += 1
+    while not work_queue.empty():
+        pass
+    thread_flag = 1
+    for t in threads:
+        t.join()
+    print("退出主线程")
+
     sys.exit(app.exec_())
