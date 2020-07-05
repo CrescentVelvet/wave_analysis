@@ -115,24 +115,24 @@ if __name__ == '__main__':
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
     
-    thread_flag = 0
-    thread_list = ["draw_pictures", "collect_data", "analy_data"]
-    number = ["One", "Two", "Three", "Four", "Five"]
-    work_queue = queue.Queue(10)
-    threads = []
-    thread_ID = 1
-    for num in number:
-        work_queue.put(num)
-    for thread_name in thread_list:
-        thread = my_threading(thread_ID, thread_name, work_queue)
-        thread.start()
-        threads.append(thread)
-        thread_ID += 1
-    while not work_queue.empty():
-        pass
-    thread_flag = 1
-    for t in threads:
-        t.join()
-    print("退出主线程")
+    # thread_flag = 0
+    # thread_list = ["draw_pictures", "collect_data", "analy_data"]
+    # number = ["One", "Two", "Three", "Four", "Five"]
+    # work_queue = queue.Queue(10)
+    # threads = []
+    # thread_ID = 1
+    # for num in number:
+    #     work_queue.put(num)
+    # for thread_name in thread_list:
+    #     thread = my_threading(thread_ID, thread_name, work_queue)
+    #     thread.start()
+    #     threads.append(thread)
+    #     thread_ID += 1
+    # while not work_queue.empty():
+    #     pass
+    # thread_flag = 1
+    # for t in threads:
+    #     t.join()
+    # print("退出主线程")
 
     sys.exit(app.exec_())
