@@ -1,7 +1,7 @@
 '''
 @Author: your name
 @Date: 2020-06-30 19:57:03
-@LastEditTime: 2020-07-01 14:08:29
+@LastEditTime: 2020-07-05 21:20:08
 @LastEditors: Please set LastEditors
 @Description: In User Settings Edit
 @FilePath: \wkl\collect.py
@@ -54,7 +54,7 @@ def parse_signal(datas):
         print('parse_param error!!!')
         return {}
     signal = []
-    for i in range(0:1024):
+    for i in range(0,1024):
         signal.append(eval('0x' + datas[12+8*i, 20+8*i]))
     return {
         'HEAD': HEAD,
@@ -73,7 +73,7 @@ def parse_signal_and_params(datas):
         print('parse_param error!!!')
         return {}
     signal = []
-    for i in range(0:1024):
+    for i in range(0,1024):
         signal.append(eval('0x' + datas[12+8*i, 20+8*i]))
     params = HEAD + datas[8204:]
     return {
@@ -99,31 +99,31 @@ def parse_signal_and_params(datas):
         'WD': eval('0x' + params[138:140]),
     }
 
-bps = 115200
-time_out = 1
-port_list = list(serial.tools.list_ports.comports())
-for i in range(len(port_list)):
-    print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-COM_NUM = input('Please input an order number to choose a COM:')
-ser = serial.Serial(list(port_list[int(COM_NUM)])[0], bps, timeout=time_out)
+# bps = 115200
+# time_out = 1
+# port_list = list(serial.tools.list_ports.comports())
+# for i in range(len(port_list)):
+#     print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+# COM_NUM = input('Please input an order number to choose a COM:')
+# ser = serial.Serial(list(port_list[int(COM_NUM)])[0], bps, timeout=time_out)
 
 
-cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
-cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
-cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
-cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
-cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
-cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
-cmd_query_param = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
+# cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
+# cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
+# cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
+# cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
+# cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
+# cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
+# cmd_query_param = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
 
 
-while True:
-    # if ser.in_waiting:
-    if True:
-        ser.write(cmd_query_param)
-        recv = ser.read(4104).hex()
-        print(recv)
-        parsed = parse_signal(recv)
-        print(parsed)
-        time.sleep(1)
-ser.close()  # close serial
+# while True:
+#     # if ser.in_waiting:
+#     if True:
+#         ser.write(cmd_query_param)
+#         recv = ser.read(4104).hex()
+#         print(recv)
+#         parsed = parse_signal(recv)
+#         print(parsed)
+#         time.sleep(1)
+# ser.close()  # close serial

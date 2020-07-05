@@ -27,6 +27,7 @@ hLine = pg.InfiniteLine(angle=0, movable=False)
 # 添加随机数据
 data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
 vb = p1.vb
+ptr = 0
 
 # matplotlib画布基类
 class MplCanvas(FigureCanvas):
@@ -81,8 +82,8 @@ class MplWidget(QtWidgets.QWidget):
         region.setZValue(10)
         p2.addItem(region, ignoreBounds=True)
         p1.setAutoVisible(y=True)
-        p1.plot(data1, pen="r")
-        p2.plot(data1, pen="w")
+        self.curve_1 = p1.plot(data1, pen="r")
+        self.curve_2 = p2.plot(data1, pen="w")
         # 设置选区初始范围
         region.setRegion([100, 200])
         minX, maxX = region.getRegion()
@@ -98,6 +99,16 @@ class MplWidget(QtWidgets.QWidget):
         proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
         p1.proxy = proxy
         layout.addWidget(win)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update)
+        self.timer.start(1000)
+
+    def update(self):
+        global p1, ptr
+        data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+        self.curve_1.setData(data1)
+        self.curve_2.setData(data1)
+        
 
 # 单个画布
 # 添加matplotlib画布
