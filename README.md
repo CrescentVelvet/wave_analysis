@@ -1,4 +1,8 @@
 ## wave_analysis
+
+# 用到的库
+numpy1.16.4, PyQt5, matplotlib3.0.3, pylab, serial, pyqtgraph0.11.0
+
 # 踩坑记录
 pyqt5中调用pyqtgraph绘图，需要新建widget并添加layout，将其设置为主widget。
 
