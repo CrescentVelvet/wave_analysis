@@ -114,7 +114,7 @@ if __name__ == '__main__':
     splash.finish(splash)
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
-    
+
     # thread_flag = 0
     # thread_list = ["draw_pictures", "collect_data", "analy_data"]
     # number = ["One", "Two", "Three", "Four", "Five"]

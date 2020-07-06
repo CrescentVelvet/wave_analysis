@@ -103,6 +103,7 @@ class MplWidget(QtWidgets.QWidget):
         self.timer.timeout.connect(self.update)
         self.timer.start(1000)
 
+    # 更新数据
     def update(self):
         global p1, ptr
         data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
