@@ -1,7 +1,7 @@
 '''
 @Author: your name
 @Date: 2020-06-30 19:57:03
-@LastEditTime: 2020-07-07 23:21:58
+@LastEditTime: 2020-07-08 00:33:29
 @LastEditors: Please set LastEditors
 @Description: In User Settings Edit
 @FilePath: \wkl\collect.py
@@ -149,7 +149,6 @@ if 0:
     COM_NUM = input('Please input an order number to choose a COM:')
     ser = serial.Serial(list(port_list[int(COM_NUM)])[0], bps, timeout=time_out)
 
-
     cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
     cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
     cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
@@ -157,7 +156,6 @@ if 0:
     cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
     cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
     cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
-
 
     while True:
         # if ser.in_waiting:

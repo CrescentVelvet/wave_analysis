@@ -31,7 +31,8 @@ hLine = pg.InfiniteLine(angle=0, movable=False)
 data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
 vb = p1.vb
 ptr = 0
-# 数据读取
+
+#***
 bps = 115200
 time_out = 1
 port_list = list(serial.tools.list_ports.comports())
@@ -41,9 +42,9 @@ if len(port_list) < 1:
     # ser = 0
     sys.exit()
 else:
-    # print("当前已插入USB设备的COM如下，前为序号，后为COM编号：")
-    # for i in range(len(port_list)):
-    #     print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+    print("当前已插入USB设备的COM如下，前为序号，后为COM编号：")
+    for i in range(len(port_list)):
+        print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
     # COM_NUM = input('Please input an order number to choose a COM:')
     ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
 
@@ -95,6 +96,7 @@ class DrawPicture(object):
                 label.setPos(mousePoint.x(), mousePoint.y())
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
+
 
 # 单个画布
 # 添加pyqtgraph画布
