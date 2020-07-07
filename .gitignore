@@ -144,3 +144,4 @@ numpy/
 PyQt5/
 pyqtgraph/
 serial/
+dicttoxml.py
