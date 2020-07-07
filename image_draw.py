@@ -31,7 +31,8 @@ hLine = pg.InfiniteLine(angle=0, movable=False)
 data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
 vb = p1.vb
 ptr = 0
-# 数据读取
+
+#***
 bps = 115200
 time_out = 1
 port_list = list(serial.tools.list_ports.comports())
@@ -44,8 +45,8 @@ else:
     print("当前已插入USB设备的COM如下，前为序号，后为COM编号：")
     for i in range(len(port_list)):
         print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-    COM_NUM = input('请选择插入USB设备的COM序号:')
-    ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
+    # COM_NUM = input('Please input an order number to choose a COM:')
+    ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
 
 cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
 cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
@@ -53,7 +54,7 @@ cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
 cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
 cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
 cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
-cmd_query_param = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
+cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
 
 # matplotlib画布基类
 class MplCanvas(FigureCanvas):
@@ -96,6 +97,7 @@ class DrawPicture(object):
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
 
+
 # 单个画布
 # 添加pyqtgraph画布
 class MplWidget(QtWidgets.QWidget):
@@ -127,17 +129,17 @@ class MplWidget(QtWidgets.QWidget):
         layout.addWidget(win)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(1000)
+        self.timer.start(5000)
 
     # 更新数据
     def update(self):
-        global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear
+        global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-        ser.write(cmd_query_data)
-        recv = ser.read(4104).hex()
+        ser.write(cmd_query_data_and_param_and_clear)
+        recv = ser.read(10240).hex()
         # print(recv)
-        parsed = collect_data.parse_signal(recv)
-        print(parsed['DATA'])
+        parsed = collect_data.parse_signal_and_params(recv)
+        print(parsed)
         data1 = np.array(parsed['DATA'], dtype=np.int64)
         self.curve_1.setData(data1)
         self.curve_2.setData(data1)
