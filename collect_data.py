@@ -1,7 +1,7 @@
 '''
 @Author: your name
 @Date: 2020-06-30 19:57:03
-@LastEditTime: 2020-07-05 21:20:08
+@LastEditTime: 2020-07-07 23:21:58
 @LastEditors: Please set LastEditors
 @Description: In User Settings Edit
 @FilePath: \wkl\collect.py
@@ -9,6 +9,9 @@
 #coding=utf-8
 import serial.tools.list_ports
 import time
+import dicttoxml
+from xml.dom.minidom import parseString
+import xml.dom.minidom
 
 # 查询参数、设置参数 收包解包
 def parse_param(datas):
@@ -22,8 +25,8 @@ def parse_param(datas):
         return {}
     return {
         'HEAD': datas,
-        'GAIN_0:': eval('0x' + datas[12:14]),
-        'GAIN_1:': eval('0x' + datas[14:16]),
+        'GAIN_0': eval('0x' + datas[12:14]),
+        'GAIN_1': eval('0x' + datas[14:16]),
         'VOL': eval('0x' + datas[16:18]),
         'VOH': eval('0x' + datas[18:20]),
         'M_T': eval('0x' + datas[20:28]),
@@ -69,9 +72,9 @@ def parse_signal_and_params(datas):
     """
     HEAD = datas[:12]
     print(HEAD)
-    if HEAD != 'FAF503824010'.lower() and HEAD != 'FAF504824010'.lower():# 前一个是查询数据和参数，后一个是查询数据和参数并清零数据
-        print('parse_param error!!!')
-        return {}
+    # if HEAD != 'FAF503824010'.lower() and HEAD != 'FAF504824810'.lower():# 前一个是查询数据和参数，后一个是查询数据和参数并清零数据
+    #     print('parse_param error!!!')
+    #     return {}
     signal = []
     for i in range(0,1024):
         signal.append(eval('0x' + datas[12+8*i: 20+8*i]))
@@ -79,8 +82,8 @@ def parse_signal_and_params(datas):
     return {
         'HEAD': HEAD,
         'DATA': signal,
-        'GAIN_0:': eval('0x' + params[12:14]),
-        'GAIN_1:': eval('0x' + params[14:16]),
+        'GAIN_0': eval('0x' + params[12:14]),
+        'GAIN_1': eval('0x' + params[14:16]),
         'VOL': eval('0x' + params[16:18]),
         'VOH': eval('0x' + params[18:20]),
         'M_T': eval('0x' + params[20:28]),
@@ -98,6 +101,45 @@ def parse_signal_and_params(datas):
         'DAY': eval('0x' + params[136:138]),
         'WD': eval('0x' + params[138:140]),
     }
+
+def save_file(dictt, filename="example.xml"):
+    xmll = dicttoxml.dicttoxml(dictt)
+    # print(xmll)
+
+    domm = parseString(xmll)
+    # print(dom.toprettyxml())
+
+    with open(filename, 'w', encoding='UTF-8') as fh:
+        domm.writexml(fh, indent='', addindent='\t', newl='\n', encoding='UTF-8')
+        # print('OK')
+
+def load_file(filename="example.xml"):
+    dom = xml.dom.minidom.parse('example.xml')
+    root = dom.documentElement  
+    return {
+        'HEAD': root.getElementsByTagName('HEAD')[0].firstChild.data,
+        'DATA': [int(node.firstChild.data) for node in root.getElementsByTagName('item')],
+        'GAIN_0': root.getElementsByTagName('GAIN_0')[0].firstChild.data,
+        'GAIN_1': root.getElementsByTagName('GAIN_1')[0].firstChild.data,
+        'VOL': root.getElementsByTagName('VOL')[0].firstChild.data,
+        'VOH': root.getElementsByTagName('VOH')[0].firstChild.data,
+        'M_T': root.getElementsByTagName('M_T')[0].firstChild.data,
+        'COUNT': root.getElementsByTagName('COUNT')[0].firstChild.data,
+        'MODE': root.getElementsByTagName('MODE')[0].firstChild.data,
+        'SOURCE': root.getElementsByTagName('SOURCE')[0].firstChild.data,
+        'RESERVE': root.getElementsByTagName('RESERVE')[0].firstChild.data,
+        'SN': root.getElementsByTagName('SN')[0].firstChild.data,
+        'ver': root.getElementsByTagName('ver')[0].firstChild.data,
+        'HOUR': root.getElementsByTagName('HOUR')[0].firstChild.data,
+        'MIN': root.getElementsByTagName('MIN')[0].firstChild.data,
+        'SEC': root.getElementsByTagName('SEC')[0].firstChild.data,
+        'YR': root.getElementsByTagName('YR')[0].firstChild.data,
+        'MON': root.getElementsByTagName('MON')[0].firstChild.data,
+        'DAY': root.getElementsByTagName('DAY')[0].firstChild.data,
+        'WD': root.getElementsByTagName('WD')[0].firstChild.data,
+    }
+
+
 if 0:
     bps = 115200
     time_out = 1
@@ -114,16 +156,24 @@ if 0:
     cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
     cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
     cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
-    cmd_query_param = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
+    cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
 
 
     while True:
         # if ser.in_waiting:
         if True:
-            ser.write(cmd_query_data)
-            recv = ser.read(4104).hex()
-            print(recv)
-            parsed = parse_signal(recv)
-            print(parsed['DATA'])
+            #发送命令
+            ser.write(cmd_query_data_and_param_and_clear)
+            #原码
+            recv = ser.read(10240).hex()
+            # print(recv)
+            #解包后是个字典
+            parsed = parse_signal_and_params(recv)
+            print(parsed)
+            #字典转换成XML再保存
+            save_file(parsed)
             time.sleep(1)
     ser.close()  # close serial
+
+if 0:#测试文件读取
+    print(load_file())
