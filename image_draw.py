@@ -31,14 +31,21 @@ hLine = pg.InfiniteLine(angle=0, movable=False)
 data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
 vb = p1.vb
 ptr = 0
-
+# 数据读取
 bps = 115200
 time_out = 1
 port_list = list(serial.tools.list_ports.comports())
-# for i in range(len(port_list)):
-    # print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-# COM_NUM = input('Please input an order number to choose a COM:')
-ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
+if len(port_list) < 1:
+    print("当前没有插入USB设备")
+    print("请插入USB设备")
+    # ser = 0
+    sys.exit()
+else:
+    print("当前已插入USB设备的COM如下，前为序号，后为COM编号：")
+    for i in range(len(port_list)):
+        print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+    COM_NUM = input('请选择插入USB设备的COM序号:')
+    ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
 
 cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
 cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
