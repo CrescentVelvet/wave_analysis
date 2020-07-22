@@ -2,6 +2,8 @@
 
 # 用到的库
 
+python3.5.4
+
 numpy1.16.4
 
 PyQt5
