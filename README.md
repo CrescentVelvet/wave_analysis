@@ -2,21 +2,19 @@
 
 # 用到的库
 
-python3.5.4
+python 3.5.4
 
-numpy1.16.4
+PyQt 5.13.0
 
-PyQt5
+pyserial 3.4
 
-matplotlib3.0.3
+numpy 1.16.4
 
-pylab
+pyqtgraph 0.11.0
 
-serial
+matplotlib 3.0.3
 
-pyqtgraph0.11.0
-
-dicttoxml-1.7.4
+dicttoxml 1.7.4
 
 # 踩坑记录
 
