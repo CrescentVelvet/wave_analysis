@@ -6,6 +6,8 @@ python 3.5.4
 
 PyQt 5.13.0
 
+serial 0.0.97
+
 pyserial 3.4
 
 numpy 1.16.4

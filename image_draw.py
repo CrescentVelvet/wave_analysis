@@ -135,11 +135,11 @@ class MplWidget(QtWidgets.QWidget):
     def update(self):
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-        ser.write(cmd_query_data_and_param_and_clear)
+        ser.write(cmd_query_data_and_param)
         recv = ser.read(10240).hex()
         # print(recv)
         parsed = collect_data.parse_signal_and_params(recv)
-        print(parsed)
+        # print(parsed)
         data1 = np.array(parsed['DATA'], dtype=np.int64)
         self.curve_1.setData(data1)
         self.curve_2.setData(data1)
