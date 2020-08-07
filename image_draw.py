@@ -11,6 +11,8 @@ import sys
 import serial.tools.list_ports
 import time
 import collect_data
+import threading
+import queue
 
 # 为了在ui_window里调用，使用了全局变量
 # 主体界面显示
@@ -32,29 +34,42 @@ data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.ran
 vb = p1.vb
 ptr = 0
 
-#***
 bps = 115200
 time_out = 1
 port_list = list(serial.tools.list_ports.comports())
-if len(port_list) < 1:
-    print("当前没有插入USB设备")
-    print("请插入USB设备")
-    # ser = 0
-    sys.exit()
-else:
-    print("当前已插入USB设备的COM如下，前为序号，后为COM编号：")
-    for i in range(len(port_list)):
-        print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-    # COM_NUM = input('Please input an order number to choose a COM:')
-    ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
+# for i in range(len(port_list)):
+    # print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+# COM_NUM = input('Please input an order number to choose a COM:')
+ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
 
 cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
 cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
-cmd_enable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # enable_MCA
-cmd_disable_MCA = bytes.fromhex('fa f5 03 00 00 00 0e fe') # disable_MCA
+cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
+cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
 cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
 cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
 cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
+
+thread_flag = 0
+
+class my_threading(threading.Thread):
+    def __init__(self, ID, name, counter):
+        threading.Thread.__init__(self)
+        self.ID = ID
+        self.name = name
+        self.counter = counter
+    def run(self):
+        print ("开始线程：" + self.name)
+        process_data(self.ID,self.name, self.counter)
+        print ("退出线程：" + self.name)
+
+def process_data(id, name, counter):
+    while not thread_flag:
+        id += 1
+        if id >= 4:
+            data = counter.get()
+            print ("%s processing %s" % (name, data))
+        time.sleep(1)
 
 # matplotlib画布基类
 class MplCanvas(FigureCanvas):
@@ -97,7 +112,6 @@ class DrawPicture(object):
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
 
-
 # 单个画布
 # 添加pyqtgraph画布
 class MplWidget(QtWidgets.QWidget):
@@ -124,18 +138,26 @@ class MplWidget(QtWidgets.QWidget):
         p1.addItem(vLine, ignoreBounds=True)
         p1.addItem(hLine, ignoreBounds=True)
         # 十字线跟随鼠标移动
-        proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
-        p1.proxy = proxy
+        # proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=DrawPicture.mouseMoved)
+        # p1.proxy = proxy
         layout.addWidget(win)
+
+        # self.update()
+
         self.timer = QtCore.QTimer()
+        # self.timer2 = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(5000)
+        # self.timer.timeout.connect(self.update_graph)
+        # self.timer.timeout.connect(self.update_data)
+        self.timer.start(500)
 
     # 更新数据
     def update(self):
+        print(time.time())
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
-        # data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-        ser.write(cmd_query_data_and_param)
+        data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+        # self.multi_thread()
+        ser.write(cmd_query_data_and_param_and_clear)
         recv = ser.read(10240).hex()
         # print(recv)
         parsed = collect_data.parse_signal_and_params(recv)
@@ -144,6 +166,38 @@ class MplWidget(QtWidgets.QWidget):
         self.curve_1.setData(data1)
         self.curve_2.setData(data1)
         
+    def multi_thread(self):
+        thread_list = ["draw_pictures", "collect_data"]
+        number = ["One", "Two"]
+        work_queue = queue.Queue(10)
+        threads = []
+        thread_ID = 1
+        for num in number:
+            work_queue.put(num)
+        for thread_name in thread_list:
+            thread = my_threading(thread_ID, thread_name, work_queue)
+            thread.start()
+            threads.append(thread)
+            thread_ID += 1
+        while not work_queue.empty():
+            pass
+        thread_flag = 0
+        for t in threads:
+            t.join()
+        print("退出线程")
+
+    def update_graph(self):
+        self.curve_1.setData(data1)
+        self.curve_2.setData(data1)
+
+    def update_data(self):
+        global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
+        ser.write(cmd_query_data_and_param_and_clear)
+        recv = ser.read(10240).hex()
+        # print(recv)
+        parsed = collect_data.parse_signal_and_params(recv)
+        # print(parsed)
+        data1 = np.array(parsed['DATA'], dtype=np.int64)
 
 # 单个画布
 # 添加matplotlib画布

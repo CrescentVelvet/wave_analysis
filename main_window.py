@@ -84,24 +84,24 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
 
-class my_threading(threading.Thread):
-    def __init__(self, ID, name, counter):
-        threading.Thread.__init__(self)
-        self.ID = ID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print ("开始线程：" + self.name)
-        process_data(self.ID,self.name, self.counter)
-        print ("退出线程：" + self.name)
+# class my_threading(threading.Thread):
+#     def __init__(self, ID, name, counter):
+#         threading.Thread.__init__(self)
+#         self.ID = ID
+#         self.name = name
+#         self.counter = counter
+#     def run(self):
+#         print ("开始线程：" + self.name)
+#         process_data(self.ID,self.name, self.counter)
+#         print ("退出线程：" + self.name)
 
-def process_data(id, name, counter):
-    while not thread_flag:
-        id += 1
-        if id >= 4:
-            data = counter.get()
-            print ("%s processing %s" % (name, data))
-        time.sleep(1)
+# def process_data(id, name, counter):
+#     while not thread_flag:
+#         id += 1
+#         if id >= 4:
+#             data = counter.get()
+#             print ("%s processing %s" % (name, data))
+#         time.sleep(1)
 
 # 主程序
 if __name__ == '__main__':
