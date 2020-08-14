@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-14 20:09:05
+LastEditTime : 2020-08-14 20:24:12
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\main_window.py
@@ -34,9 +34,10 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(DesignerMainWindow, self).__init__(parent) 
         self.setWindowTitle("波形显示界面")              
         self.setupUi(self)
-        # 主界面上的按钮触发开始与停止采集函数的进程
+        # 主界面上的按钮触发开始采集、停止采集、数据清零函数的进程
         self.startButton.clicked.connect(self.startButton_callback)
         self.stopButton.clicked.connect(self.stopButton_callback)
+        self.clearButton.clicked.connect(self.clearButton_callback)
         # 主界面菜单栏上的帮助与更多选项跳转到信息介绍窗口
         self.action_QT.triggered.connect(self.QT_callback)
         self.action_PYQT.triggered.connect(self.PYQT_callback)
@@ -61,6 +62,12 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
         image_control.stop_to_collect()
+    
+    def clearButton_callback(self):
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.button_Browse.setEnabled(False)
+        image_control.clear_data()
 
     def QT_callback(self):
         # 设置帮助菜单中的关于QT的信息介绍

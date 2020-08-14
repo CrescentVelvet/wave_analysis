@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-14 20:10:12
+LastEditTime : 2020-08-14 20:33:52
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\image_draw.py
@@ -26,6 +26,7 @@ class image_flag:
     sim_flag = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag = 0# 采集数据开关
+    clear_flag = 0# 清零数据开关
 
 class image_control:
     # 开始采集数据
@@ -37,6 +38,11 @@ class image_control:
     def stop_to_collect():
         image_flag.start_flag = 0
         print("停止采集数据")
+    
+    # 清零全部数据
+    def clear_data():
+        image_flag.clear_flag = 1
+        print("数据已全部清零")
 
 # 为了在ui_window里调用，使用了全局变量
 # 主体界面显示
@@ -135,7 +141,7 @@ class DrawPicture(object):
             # print(mousePoint)
             index = int(mousePoint.x())
             if index > 0 and index < len(data1):
-                label.setText("<span style='font-size: 12pt'>time=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f</span>" % (time.time()%100, mousePoint.x(), data1[index]))
+                label.setText("<span style='font-size: 12pt'>当前时间=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f, <span style='color: yellow'>当前道计数=%6.1f个</span>" % (time.time()%100, mousePoint.x(), mousePoint.y(), data1[index]))
                 label.setPos(mousePoint.x(), mousePoint.y())
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
@@ -194,11 +200,17 @@ class MplWidget(QtWidgets.QWidget):
             parsed = collect_data.parse_signal_and_params(recv)
             # print(parsed)
             data1 = np.array(parsed['DATA'], dtype=np.int64)
-        # 绘制图像
+        # 绘制图像并开始采集
         if image_flag.start_flag == 1:
             self.curve_1.setData(data1)
             self.curve_2.setData(data1)
-        # print(image_flag.start_flag)
+        # 清零图像并停止采集
+        if image_flag.clear_flag == 1:
+            data1 = np.zeros(1000)
+            self.curve_1.setData(data1)
+            self.curve_2.setData(data1)
+            image_flag.clear_flag = 0
+            image_flag.start_flag = 0
 
 '''
 description: 多线程的失败尝试
