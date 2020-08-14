@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-14 20:33:52
+LastEditTime : 2020-08-14 20:46:49
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\image_draw.py
@@ -32,17 +32,17 @@ class image_control:
     # 开始采集数据
     def start_to_collect():
         image_flag.start_flag = 1
-        print("开始采集数据")
+        print('开始采集数据')
     
     # 停止采集数据
     def stop_to_collect():
         image_flag.start_flag = 0
-        print("停止采集数据")
+        print('停止采集数据')
     
     # 清零全部数据
     def clear_data():
         image_flag.clear_flag = 1
-        print("数据已全部清零")
+        print('数据已全部清零')
 
 # 为了在ui_window里调用，使用了全局变量
 # 主体界面显示

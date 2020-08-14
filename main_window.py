@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-14 20:24:12
+LastEditTime : 2020-08-14 20:46:34
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\main_window.py
@@ -56,18 +56,21 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(True)
         self.button_Browse.setEnabled(False)
         image_control.start_to_collect()
+        self.textEdit.append('开始采集数据')
 
     def stopButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
         image_control.stop_to_collect()
+        self.textEdit.append('停止采集数据')
     
     def clearButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
         image_control.clear_data()
+        self.textEdit.append('数据已全部清零')
 
     def QT_callback(self):
         # 设置帮助菜单中的关于QT的信息介绍
@@ -88,7 +91,7 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def ZJU_callback(self):
         # 设置帮助菜单中的关于浙江大学的信息介绍
         QMessageBox.about(self, 'About ZJU', '<p>866 Yuhangtang Rd, Hangzhou 310058, P.R. China&nbsp;</p><p>Copyright &copy; '
-            + ' 2018 <a href="http://www.zju.edu.cn/" target="_blank">Zhejiang University</a>&nbsp;</p><p>Seeking Truth, Pursuing Innovation.</p>')
+            + ' 2020 <a href="http://www.zju.edu.cn/" target="_blank">Zhejiang University</a>&nbsp;</p><p>Seeking Truth, Pursuing Innovation.</p>')
     
     def browse_callback(self):
         # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
