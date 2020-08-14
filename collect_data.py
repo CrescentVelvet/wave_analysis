@@ -1,10 +1,10 @@
 '''
-@Author: your name
-@Date: 2020-06-30 19:57:03
-@LastEditTime: 2020-07-27 09:47:02
-@LastEditors: Please set LastEditors
-@Description: In User Settings Edit
-@FilePath: \wkl\collect.py
+Author       : velvet
+Date         : 2020-08-07 22:35:47
+LastEditTime : 2020-08-14 19:28:56
+LastEditors  : velvet
+Description  : 
+FilePath     : \wave_analysis\collect_data.py
 '''
 #coding=utf-8
 import serial.tools.list_ports
@@ -13,7 +13,11 @@ import dicttoxml
 from xml.dom.minidom import parseString
 import xml.dom.minidom
 
-# 查询参数、设置参数 收包解包
+'''
+description: 查询参数、设置参数、收包解包
+param {type} 
+return {type} 
+'''
 def parse_param(datas):
     """
     :param datas: str()
@@ -45,7 +49,11 @@ def parse_param(datas):
         'WD': eval('0x' + datas[138:140]),
     }
 
-# 查询数据、查询清零数据 收包接包
+'''
+description: 查询数据、查询清零数据、收包接包
+param {type} 
+return {type} 
+'''
 def parse_signal(datas):
     """
     :param datas: str()
@@ -64,12 +72,12 @@ def parse_signal(datas):
         'DATA': signal
     }
 
-# 查询数据和参数、查询数据和参数并清零数据
+'''
+description: 查询数据和参数、查询数据和参数并清零数据
+param: str()
+return: dict()
+'''
 def parse_signal_and_params(datas):
-    """
-    :param datas: str()
-    :return: dict()
-    """
     HEAD = datas[:12]
     print(HEAD)
     # if HEAD != 'FAF503824010'.lower() and HEAD != 'FAF504824810'.lower():# 前一个是查询数据和参数，后一个是查询数据和参数并清零数据
@@ -106,10 +114,8 @@ def parse_signal_and_params(datas):
 def save_file(dictt, filename="example.xml"):
     xmll = dicttoxml.dicttoxml(dictt)
     # print(xmll)
-
     domm = parseString(xmll)
     # print(dom.toprettyxml())
-
     with open(filename, 'w', encoding='UTF-8') as fh:
         domm.writexml(fh, indent='', addindent='\t', newl='\n', encoding='UTF-8')
         # print('OK')
@@ -140,41 +146,46 @@ def load_file(filename="example.xml"):
         'WD': root.getElementsByTagName('WD')[0].firstChild.data,
     }
 
+'''
+description: 测试指令发送
+param {type} 
+return {type} 
+'''
+# if 0:
+#     bps = 115200
+#     time_out = 1
+#     port_list = list(serial.tools.list_ports.comports())
+#     for i in range(len(port_list)):
+#         print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+#     COM_NUM = input('Please input an order number to choose a COM:')
+#     ser = serial.Serial(list(port_list[int(COM_NUM)])[0], bps, timeout=time_out)
+#     cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
+#     cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
+#     cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
+#     cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
+#     cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
+#     cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
+#     cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
+#     while True:
+#         # if ser.in_waiting:
+#         if True:
+#             #发送命令
+#             ser.write(cmd_query_data_and_param_and_clear)
+#             #原码
+#             recv = ser.read(10240).hex()
+#             # print(recv)
+#             #解包后是个字典
+#             parsed = parse_signal_and_params(recv)
+#             print(parsed)
+#             #字典转换成XML再保存
+#             save_file(parsed)
+#             time.sleep(1)
+#     ser.close()  # close serial
 
-if 0:
-    bps = 115200
-    time_out = 1
-    port_list = list(serial.tools.list_ports.comports())
-    for i in range(len(port_list)):
-        print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-    COM_NUM = input('Please input an order number to choose a COM:')
-    ser = serial.Serial(list(port_list[int(COM_NUM)])[0], bps, timeout=time_out)
-
-
-    cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
-    cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
-    cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
-    cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
-    cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
-    cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
-    cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
-
-
-    while True:
-        # if ser.in_waiting:
-        if True:
-            #发送命令
-            ser.write(cmd_query_data_and_param_and_clear)
-            #原码
-            recv = ser.read(10240).hex()
-            # print(recv)
-            #解包后是个字典
-            parsed = parse_signal_and_params(recv)
-            print(parsed)
-            #字典转换成XML再保存
-            save_file(parsed)
-            time.sleep(1)
-    ser.close()  # close serial
-
-if 0:#测试文件读取
-    print(load_file())
+'''
+description: 测试文件读取
+param {type} 
+return {type} 
+'''
+# if 0:
+#     print(load_file())

@@ -1,3 +1,11 @@
+'''
+Author       : velvet
+Date         : 2020-08-07 22:38:06
+LastEditTime : 2020-08-14 19:30:23
+LastEditors  : velvet
+Description  : 
+FilePath     : \wave_analysis\main_window.py
+'''
 #coding=utf-8
 from __future__ import with_statement
 import numpy as np
@@ -14,6 +22,11 @@ import asyncio
 import threading
 import queue
 
+'''
+description: 主界面窗口
+param {type} 
+return {type} 
+'''
 class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         # 主窗口继承
@@ -103,7 +116,11 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 #             print ("%s processing %s" % (name, data))
 #         time.sleep(1)
 
-# 主程序
+'''
+description: 主程序
+param {type} 
+return {type} 
+'''
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     t = QtCore.QElapsedTimer()
@@ -115,6 +132,11 @@ if __name__ == '__main__':
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
 
+    '''
+    description: 多线程测试
+    param {type} 
+    return {type} 
+    '''
     # thread_flag = 0
     # thread_list = ["draw_pictures", "collect_data", "analy_data"]
     # number = ["One", "Two", "Three", "Four", "Five"]
