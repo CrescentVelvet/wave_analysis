@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-14 19:25:09
+LastEditTime : 2020-08-14 20:10:12
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\image_draw.py
@@ -22,8 +22,21 @@ import collect_data
 import threading
 import queue
 
-sim_flag = 1 # 仿真flag
-thread_flag = 0 # 多线程flag
+class image_flag:
+    sim_flag = 1 # 仿真测试开关
+    thread_flag = 0 # 多线程开关
+    start_flag = 0# 采集数据开关
+
+class image_control:
+    # 开始采集数据
+    def start_to_collect():
+        image_flag.start_flag = 1
+        print("开始采集数据")
+    
+    # 停止采集数据
+    def stop_to_collect():
+        image_flag.start_flag = 0
+        print("停止采集数据")
 
 # 为了在ui_window里调用，使用了全局变量
 # 主体界面显示
@@ -45,7 +58,7 @@ data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.ran
 vb = p1.vb
 ptr = 0
 
-if sim_flag == 0:
+if image_flag.sim_flag == 0:
     print("现在是实际测试")
     bps = 115200
     time_out = 1
@@ -56,7 +69,6 @@ if sim_flag == 0:
     # COM_NUM = input('Please input an order number to choose a COM:')
     # ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
     ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
-
     cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
     cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
     cmd_enable_MCA = bytes.fromhex('fa f5 01 00 00 00 10 fe') # enable_MCA
@@ -68,24 +80,24 @@ if sim_flag == 0:
 else:
     print("现在是仿真测试")
 
-class my_threading(threading.Thread):
-    def __init__(self, ID, name, counter):
-        threading.Thread.__init__(self)
-        self.ID = ID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print ("开始线程：" + self.name)
-        process_data(self.ID,self.name, self.counter)
-        print ("退出线程：" + self.name)
+# class my_threading(threading.Thread):
+#     def __init__(self, ID, name, counter):
+#         threading.Thread.__init__(self)
+#         self.ID = ID
+#         self.name = name
+#         self.counter = counter
+#     def run(self):
+#         print ("开始线程：" + self.name)
+#         process_data(self.ID,self.name, self.counter)
+#         print ("退出线程：" + self.name)
 
-def process_data(id, name, counter):
-    while not thread_flag:
-        id += 1
-        if id >= 4:
-            data = counter.get()
-            print ("%s processing %s" % (name, data))
-        time.sleep(1)
+# def process_data(id, name, counter):
+#     while not thread_flag:
+#         id += 1
+#         if id >= 4:
+#             data = counter.get()
+#             print ("%s processing %s" % (name, data))
+#         time.sleep(1)
 
 # matplotlib画布基类
 class MplCanvas(FigureCanvas):
@@ -123,7 +135,7 @@ class DrawPicture(object):
             # print(mousePoint)
             index = int(mousePoint.x())
             if index > 0 and index < len(data1):
-                label.setText("<span style='font-size: 12pt'>x=%0.1f,   <span style='color: red'>y1=%0.1f</span>" % (mousePoint.x(), data1[index]))
+                label.setText("<span style='font-size: 12pt'>time=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f</span>" % (time.time()%100, mousePoint.x(), data1[index]))
                 label.setPos(mousePoint.x(), mousePoint.y())
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
@@ -169,10 +181,12 @@ class MplWidget(QtWidgets.QWidget):
 
     # 更新数据
     def update(self):
-        print(time.time())
+        # 当前时间
+        # print(time.time())
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
+        # 更新随机数据
         data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-        if sim_flag == 0:
+        if image_flag.sim_flag == 0:
             # self.multi_thread()
             ser.write(cmd_query_data_and_param_and_clear)
             recv = ser.read(10240).hex()
@@ -180,8 +194,11 @@ class MplWidget(QtWidgets.QWidget):
             parsed = collect_data.parse_signal_and_params(recv)
             # print(parsed)
             data1 = np.array(parsed['DATA'], dtype=np.int64)
-        self.curve_1.setData(data1)
-        self.curve_2.setData(data1)
+        # 绘制图像
+        if image_flag.start_flag == 1:
+            self.curve_1.setData(data1)
+            self.curve_2.setData(data1)
+        # print(image_flag.start_flag)
 
 '''
 description: 多线程的失败尝试

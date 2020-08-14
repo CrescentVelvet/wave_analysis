@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-14 19:30:23
+LastEditTime : 2020-08-14 20:09:05
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\main_window.py
@@ -12,6 +12,7 @@ import numpy as np
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from ui_window import Ui_MainWindow
+from image_draw import image_control
 import os
 import matplotlib.pyplot as plt
 from pylab import *
@@ -50,14 +51,16 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.button_Browse.clicked.connect(self.browse_callback)
 
     def startButton_callback(self):
-        self.startButton.setEnabled(True)
+        self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
-        self.button_Browse.setEnabled(True)
+        self.button_Browse.setEnabled(False)
+        image_control.start_to_collect()
 
     def stopButton_callback(self):
-        self.startButton.setEnabled(False)
+        self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
+        image_control.stop_to_collect()
 
     def QT_callback(self):
         # 设置帮助菜单中的关于QT的信息介绍
