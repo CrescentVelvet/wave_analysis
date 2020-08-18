@@ -1,10 +1,9 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-18 15:05:05
+LastEditTime : 2020-08-18 15:16:43
 LastEditors  : velvet
 Description  : 
-FilePath     : \wave_analysis\image_draw.py
 '''
 #coding=utf-8
 from PyQt5 import QtGui, QtCore
@@ -27,7 +26,7 @@ class image_flag:
     thread_flag = 0 # 多线程开关
     start_flag = 0# 采集数据开关
     clear_flag = 0# 清零数据开关
-    info_string = ['aaa']# 返回的信息
+    info_string = ['zero']# 返回的信息
 
 class image_control:
     # 开始采集数据
@@ -45,9 +44,10 @@ class image_control:
         image_flag.clear_flag = 1
         print('数据已全部清零')
 
+    # 更新状态信息
     def update_info():
         info_str = image_flag.info_string[0]
-        print('update_info')
+        print('更新了状态信息')
         return info_str
 
 # 为了在ui_window里调用，使用了全局变量

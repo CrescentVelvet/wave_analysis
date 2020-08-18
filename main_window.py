@@ -4,7 +4,6 @@ Date         : 2020-08-07 22:38:06
 LastEditTime : 2020-08-18 15:05:41
 LastEditors  : velvet
 Description  : 
-FilePath     : \wave_analysis\main_window.py
 '''
 #coding=utf-8
 from __future__ import with_statement

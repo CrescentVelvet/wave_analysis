@@ -4,7 +4,6 @@ Date         : 2020-08-07 22:35:47
 LastEditTime : 2020-08-18 15:05:32
 LastEditors  : velvet
 Description  : 
-FilePath     : \wave_analysis\collect_data.py
 '''
 #coding=utf-8
 import serial.tools.list_ports

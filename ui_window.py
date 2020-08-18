@@ -4,7 +4,6 @@ Date         : 2020-06-30 18:36:09
 LastEditTime : 2020-08-14 20:51:25
 LastEditors  : velvet
 Description  : 
-FilePath     : \wave_analysis\ui_window.py
 '''
 #coding=utf-8
 from PyQt5 import QtCore, QtGui, QtWidgets
