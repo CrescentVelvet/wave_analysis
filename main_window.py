@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-14 20:46:34
+LastEditTime : 2020-08-18 15:05:41
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\main_window.py
@@ -50,12 +50,14 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.setReadOnly(True)
         # 点击选择目录按钮打开文件
         self.button_Browse.clicked.connect(self.browse_callback)
+        
 
     def startButton_callback(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.button_Browse.setEnabled(False)
         image_control.start_to_collect()
+        self.textEdit.append(image_control.update_info())
         self.textEdit.append('开始采集数据')
 
     def stopButton_callback(self):

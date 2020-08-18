@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-14 20:46:49
+LastEditTime : 2020-08-18 15:05:05
 LastEditors  : velvet
 Description  : 
 FilePath     : \wave_analysis\image_draw.py
@@ -27,6 +27,7 @@ class image_flag:
     thread_flag = 0 # 多线程开关
     start_flag = 0# 采集数据开关
     clear_flag = 0# 清零数据开关
+    info_string = ['aaa']# 返回的信息
 
 class image_control:
     # 开始采集数据
@@ -43,6 +44,11 @@ class image_control:
     def clear_data():
         image_flag.clear_flag = 1
         print('数据已全部清零')
+
+    def update_info():
+        info_str = image_flag.info_string[0]
+        print('update_info')
+        return info_str
 
 # 为了在ui_window里调用，使用了全局变量
 # 主体界面显示
@@ -187,6 +193,7 @@ class MplWidget(QtWidgets.QWidget):
 
     # 更新数据
     def update(self):
+        image_flag.info_string[0] = 'aaaa'
         # 当前时间
         # print(time.time())
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
@@ -198,6 +205,9 @@ class MplWidget(QtWidgets.QWidget):
             recv = ser.read(10240).hex()
             # print(recv)
             parsed = collect_data.parse_signal_and_params(recv)
+            for item in parsed.keys():
+                if item is not 'DATA':
+                    image_flag.info_string.append(parsed[item])
             # print(parsed)
             data1 = np.array(parsed['DATA'], dtype=np.int64)
         # 绘制图像并开始采集
