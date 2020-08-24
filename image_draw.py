@@ -145,7 +145,6 @@ class DrawPicture(object):
         pos = evt[0]
         if p1.sceneBoundingRect().contains(pos):
             mousePoint = vb.mapSceneToView(pos)
-            # print(mousePoint)
             # 获取鼠标坐标
             mouse_x = int(mousePoint.x())
             # 获取上图选区范围
@@ -208,7 +207,7 @@ class MplWidget(QtWidgets.QWidget):
         data1 = np.zeros(1000)
         if image_flag.sim_flag == 0:
             # self.multi_thread()
-            ser.write(cmd_query_data_and_param_and_clear)
+            ser.write(cmd_query_data_and_param)
             recv = ser.read(10240).hex()
             # print(recv)
             parsed = collect_data.parse_signal_and_params(recv)
