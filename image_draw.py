@@ -131,6 +131,7 @@ class DrawPicture(object):
     # 移动下图选区改变上图
     def update():
         region.setZValue(10)
+        # 获取上图选区范围
         minX, maxX = region.getRegion()
         p1.setXRange(minX, maxX, padding=0)
 
@@ -145,9 +146,14 @@ class DrawPicture(object):
         if p1.sceneBoundingRect().contains(pos):
             mousePoint = vb.mapSceneToView(pos)
             # print(mousePoint)
-            index = int(mousePoint.x())
-            if index > 0 and index < len(data1):
-                label.setText("<span style='font-size: 12pt'>当前时间=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f, <span style='color: yellow'>当前道计数=%6.1f个</span>" % (time.time()%100, mousePoint.x(), mousePoint.y(), data1[index]))
+            # 获取鼠标坐标
+            mouse_x = int(mousePoint.x())
+            # 获取上图选区范围
+            minX, maxX = region.getRegion()
+            # 将鼠标坐标映射到上图并取整
+            index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
+            if index > minX and index < maxX:
+                label.setText("<span style='font-size: 12pt'>当前时间=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f, <span style='color: yellow'>当前道计数=%6.1f个</span>" % (time.time()%100, mousePoint.x(), mousePoint.y(), int(data1[index])))
                 label.setPos(mousePoint.x(), mousePoint.y())
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
@@ -198,7 +204,8 @@ class MplWidget(QtWidgets.QWidget):
         # print(time.time())
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # 更新随机数据
-        data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+        #data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+        data1 = np.zeros(1000)
         if image_flag.sim_flag == 0:
             # self.multi_thread()
             ser.write(cmd_query_data_and_param_and_clear)
