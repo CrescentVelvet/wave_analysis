@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-18 15:16:43
+LastEditTime : 2020-08-24 21:43:55
 LastEditors  : velvet
 Description  : 
 '''
@@ -17,6 +17,7 @@ from pyqtgraph.Point import Point
 import sys
 import serial.tools.list_ports
 import time
+import datetime
 import collect_data
 import threading
 import queue
@@ -55,18 +56,24 @@ class image_control:
 win = pg.GraphicsLayoutWidget(show=False)
 win.setWindowTitle('wave display')
 # 显示鼠标坐标
-label = pg.LabelItem(justify='right')
-win.addItem(label)
+label_data = pg.LabelItem(justify='left')
+label_data.setPos(0, 0)
+win.addItem(label_data)
+# 显示当前时间
+label_time = pg.LabelItem(justify='right')
+label_time.setPos(0, 0)
+win.addItem(label_time)
 # 添加两个画图界面：上图p1，下图p2
-p1 = win.addPlot(row=1, col=0)
-p2 = win.addPlot(row=2, col=0)
+p1 = win.addPlot(row=2, col=0)
+p2 = win.addPlot(row=3, col=0)
 # 添加下图选区
 region = pg.LinearRegionItem()
 # 显示鼠标十字线
 vLine = pg.InfiniteLine(angle=90, movable=False)
 hLine = pg.InfiniteLine(angle=0, movable=False)
 # 添加随机数据
-data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+# data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+data1 = np.zeros(1000)
 vb = p1.vb
 ptr = 0
 
@@ -129,14 +136,14 @@ class MplCanvas(FigureCanvas):
 
 class DrawPicture(object):
     # 移动下图选区改变上图
-    def update():
+    def update_region_above():
         region.setZValue(10)
         # 获取上图选区范围
         minX, maxX = region.getRegion()
         p1.setXRange(minX, maxX, padding=0)
 
     # 移动上图改变下图选区
-    def updateRegion(window, viewRange):
+    def update_region_below(window, viewRange):
         rgn = viewRange[0]
         region.setRegion(rgn)
 
@@ -152,8 +159,12 @@ class DrawPicture(object):
             # 将鼠标坐标映射到上图并取整
             index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
             if index > minX and index < maxX:
-                label.setText("<span style='font-size: 12pt'>当前时间=%6.1fs， <span style='color: green'>x=%6.1f,  <span style='color: red'>y=%6.1f, <span style='color: yellow'>当前道计数=%6.1f个</span>" % (time.time()%100, mousePoint.x(), mousePoint.y(), int(data1[index])))
-                label.setPos(mousePoint.x(), mousePoint.y())
+                label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: red'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1f个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
+            # 当前日期时间
+            time_data = datetime.datetime.now()
+            time_str1 = datetime.datetime.strftime(time_data,'%Y-%m-%d')
+            time_str2 = datetime.datetime.strftime(time_data,'%H:%M:%S')
+            label_time.setText(time_str1 + '\t' + time_str2)
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
 
@@ -176,9 +187,9 @@ class MplWidget(QtWidgets.QWidget):
         minX, maxX = region.getRegion()
         p1.setXRange(minX, maxX, padding=0)
         # 移动下图选区改变上图
-        region.sigRegionChanged.connect(DrawPicture.update)
+        region.sigRegionChanged.connect(DrawPicture.update_region_above)
         # 移动上图改变下图选区
-        p1.sigRangeChanged.connect(DrawPicture.updateRegion)
+        p1.sigRangeChanged.connect(DrawPicture.update_region_below)
         # 添加鼠标十字线
         p1.addItem(vLine, ignoreBounds=True)
         p1.addItem(hLine, ignoreBounds=True)
@@ -187,23 +198,18 @@ class MplWidget(QtWidgets.QWidget):
         p1.proxy = proxy
         layout.addWidget(win)
 
-        # self.update()
-
         self.timer = QtCore.QTimer()
         # self.timer2 = QtCore.QTimer()
-        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.update_data)
         # self.timer.timeout.connect(self.update_graph)
         # self.timer.timeout.connect(self.update_data)
         self.timer.start(500)
 
     # 更新数据
-    def update(self):
-        image_flag.info_string[0] = 'aaaa'
-        # 当前时间
-        # print(time.time())
+    def update_data(self):
+        image_flag.info_string[0] = '————————'
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # 更新随机数据
-        #data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
         data1 = np.zeros(1000)
         if image_flag.sim_flag == 0:
             # self.multi_thread()
