@@ -56,7 +56,7 @@ class image_control:
 win = pg.GraphicsLayoutWidget(show=False)
 win.setWindowTitle('wave display')
 # 显示鼠标坐标
-label_data = pg.LabelItem(justify='left')
+label_data = pg.LabelItem(justify='right')
 label_data.setPos(0, 0)
 win.addItem(label_data)
 # # 显示当前时间————失败：与label_data无法在同一个layout上
@@ -159,7 +159,7 @@ class DrawPicture(object):
             # 将鼠标坐标映射到上图并取整
             index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
             if index > minX and index < maxX:
-                label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: red'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1f个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
+                label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: purple'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
             # # 当前日期时间————失败：与label_data无法在同一个layout上
             # time_data = datetime.datetime.now()
             # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
