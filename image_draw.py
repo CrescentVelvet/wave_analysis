@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-24 21:43:55
+LastEditTime : 2020-08-25 20:49:59
 LastEditors  : velvet
 Description  : 
 '''
@@ -17,7 +17,7 @@ from pyqtgraph.Point import Point
 import sys
 import serial.tools.list_ports
 import time
-import datetime
+# import datetime
 import collect_data
 import threading
 import queue
@@ -59,10 +59,10 @@ win.setWindowTitle('wave display')
 label_data = pg.LabelItem(justify='left')
 label_data.setPos(0, 0)
 win.addItem(label_data)
-# 显示当前时间
-label_time = pg.LabelItem(justify='right')
-label_time.setPos(0, 0)
-win.addItem(label_time)
+# # 显示当前时间————失败：与label_data无法在同一个layout上
+# label_time = pg.LabelItem(justify='right')
+# label_time.setPos(0, 0)
+# win.addItem(label_time)
 # 添加两个画图界面：上图p1，下图p2
 p1 = win.addPlot(row=2, col=0)
 p2 = win.addPlot(row=3, col=0)
@@ -160,11 +160,10 @@ class DrawPicture(object):
             index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
             if index > minX and index < maxX:
                 label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: red'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1f个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
-            # 当前日期时间
-            time_data = datetime.datetime.now()
-            time_str1 = datetime.datetime.strftime(time_data,'%Y-%m-%d')
-            time_str2 = datetime.datetime.strftime(time_data,'%H:%M:%S')
-            label_time.setText(time_str1 + '\t' + time_str2)
+            # # 当前日期时间————失败：与label_data无法在同一个layout上
+            # time_data = datetime.datetime.now()
+            # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+            # label_time.setText(time_str)
             vLine.setPos(mousePoint.x())
             hLine.setPos(mousePoint.y())
 

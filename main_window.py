@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-18 15:05:41
+LastEditTime : 2020-08-25 20:50:53
 LastEditors  : velvet
 Description  : 
 '''
@@ -18,6 +18,7 @@ from pylab import *
 from PyQt5.QtWidgets import QMessageBox
 import sys
 import time
+import datetime
 import asyncio
 import threading
 import queue
@@ -56,6 +57,11 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(True)
         self.button_Browse.setEnabled(False)
         image_control.start_to_collect()
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
         self.textEdit.append(image_control.update_info())
         self.textEdit.append('开始采集数据')
 
@@ -64,6 +70,11 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
         image_control.stop_to_collect()
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
         self.textEdit.append('停止采集数据')
     
     def clearButton_callback(self):
@@ -71,6 +82,11 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(False)
         self.button_Browse.setEnabled(False)
         image_control.clear_data()
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
         self.textEdit.append('数据已全部清零')
 
     def QT_callback(self):
