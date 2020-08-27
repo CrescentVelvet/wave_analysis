@@ -23,10 +23,11 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 0 # 仿真测试开关
+    sim_flag    = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
-    clear_flag  = 0 # 清零数据开关
+    clear_store_flag = 0 # 清零存储数据开关
+    clear_board_flag = 1 # 清零电路板数据开关
     info_string = ['zero']  # 返回的信息
 
 class image_control:
@@ -42,7 +43,7 @@ class image_control:
     
     # 清零全部数据
     def clear_data():
-        image_flag.clear_flag = 1
+        image_flag.clear_store_flag = 1
         print('数据已全部清零')
 
     # 更新状态信息
@@ -64,8 +65,8 @@ win.addItem(label_data)
 # label_time.setPos(0, 0)
 # win.addItem(label_time)
 # 添加两个画图界面：上图p1，下图p2
-p1 = win.addPlot(row=2, col=0)
-p2 = win.addPlot(row=3, col=0)
+p1 = win.addPlot(row=1, col=0)
+p2 = win.addPlot(row=2, col=0)
 # 添加下图选区
 region = pg.LinearRegionItem()
 # 显示鼠标十字线
@@ -179,8 +180,23 @@ class MplWidget(QtWidgets.QWidget):
         region.setZValue(10)
         p2.addItem(region, ignoreBounds=True)
         p1.setAutoVisible(y=True)
-        self.curve_1 = p1.plot(data1, pen="r")
-        self.curve_2 = p2.plot(data1, pen="w")
+        # 减少数据量，相邻数据取平均
+        data2 = np.zeros(len(data1)//10)
+        for i in range(len(data1)):
+            data2[i//10] += data1[i]
+            if (i+1) % 10 == 0:
+                data2[i//10] /= 10
+        # 绘制折线图
+        # self.curve_1 = p1.plot(data1, pen="b")
+        self.curve_2 = p2.plot(data1, pen="y")
+        # 绘制直方图
+        # np.histogram处理累计数据
+        # hist, bin_edges = np.histogram(data1, bins=len(data1))
+        # self.curve_1 = p1.plot(bin_edges, hist, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
+        # np.linspace创建等差数列
+        # self.curve_1 = p1.plot(data2, pen="b")
+        self.curve_1 = p1.plot(np.linspace(0, len(data2), len(data2)+1), data2, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
+
         # 设置选区初始范围
         region.setRegion([250, 350])
         minX, maxX = region.getRegion()
@@ -213,7 +229,12 @@ class MplWidget(QtWidgets.QWidget):
         # 实际测试
         if image_flag.sim_flag == 0:
             # self.multi_thread()
-            ser.write(cmd_query_data_and_param)
+            # 清零电路板数据
+            if image_flag.clear_board_flag == 1:
+                ser.write(cmd_query_data_and_param_and_clear)
+                image_flag.clear_board_flag = 0
+            else:
+                ser.write(cmd_query_data_and_param)
             recv = ser.read(10240).hex()
             # print(recv)
             parsed = collect_data.parse_signal_and_params(recv)
@@ -224,17 +245,19 @@ class MplWidget(QtWidgets.QWidget):
             data1 = np.array(parsed['DATA'], dtype=np.int64)
         # 仿真测试
         elif image_flag.sim_flag == 1:
-            data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10)
+            # data1 = 1000 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
+            data1 = 300 * np.random.random(size=1000)
         # 绘制图像并开始采集
         if image_flag.start_flag == 1:
             self.curve_1.setData(data1)
             self.curve_2.setData(data1)
         # 清零图像并停止采集
-        if image_flag.clear_flag == 1:
+        if image_flag.clear_store_flag == 1:
             data1 = np.zeros(1000)
             self.curve_1.setData(data1)
             self.curve_2.setData(data1)
-            image_flag.clear_flag = 0
+            image_flag.clear_board_flag = 1
+            image_flag.clear_store_flag = 0
             image_flag.start_flag = 0
 
 '''
