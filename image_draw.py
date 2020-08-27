@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-25 20:49:59
+LastEditTime : 2020-08-27 13:32:26
 LastEditors  : velvet
 Description  : 
 '''
@@ -23,11 +23,11 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag = 1 # 仿真测试开关
+    sim_flag    = 0 # 仿真测试开关
     thread_flag = 0 # 多线程开关
-    start_flag = 0# 采集数据开关
-    clear_flag = 0# 清零数据开关
-    info_string = ['zero']# 返回的信息
+    start_flag  = 0 # 采集数据开关
+    clear_flag  = 0 # 清零数据开关
+    info_string = ['zero']  # 返回的信息
 
 class image_control:
     # 开始采集数据
@@ -210,6 +210,7 @@ class MplWidget(QtWidgets.QWidget):
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # 更新随机数据
         data1 = np.zeros(1000)
+        # 实际测试
         if image_flag.sim_flag == 0:
             # self.multi_thread()
             ser.write(cmd_query_data_and_param)
@@ -221,6 +222,9 @@ class MplWidget(QtWidgets.QWidget):
                     image_flag.info_string.append(parsed[item])
             # print(parsed)
             data1 = np.array(parsed['DATA'], dtype=np.int64)
+        # 仿真测试
+        elif image_flag.sim_flag == 1:
+            data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10)
         # 绘制图像并开始采集
         if image_flag.start_flag == 1:
             self.curve_1.setData(data1)
