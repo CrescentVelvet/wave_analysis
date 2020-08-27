@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-27 13:32:26
+LastEditTime : 2020-08-27 22:04:03
 LastEditors  : velvet
 Description  : 
 '''
@@ -23,7 +23,7 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 1 # 仿真测试开关
+    sim_flag    = 0 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_store_flag = 0 # 清零存储数据开关
@@ -182,20 +182,26 @@ class MplWidget(QtWidgets.QWidget):
         p1.setAutoVisible(y=True)
         # 减少数据量，相邻数据取平均
         data2 = np.zeros(len(data1)//10)
+        avg_flag = 0
         for i in range(len(data1)):
             data2[i//10] += data1[i]
-            if (i+1) % 10 == 0:
-                data2[i//10] /= 10
+            if (i+1) % 10 != 0:
+                avg_flag += 1
+            elif (i+1) % 10 == 0 or i == len(data1)-1:
+                data2[i//10] /= avg_flag
+                avg_flag = 0
         # 绘制折线图
         # self.curve_1 = p1.plot(data1, pen="b")
         self.curve_2 = p2.plot(data1, pen="y")
+        # self.curve_2 = p2.plot(data2, pen="y")
         # 绘制直方图
         # np.histogram处理累计数据
         # hist, bin_edges = np.histogram(data1, bins=len(data1))
         # self.curve_1 = p1.plot(bin_edges, hist, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
         # np.linspace创建等差数列
         # self.curve_1 = p1.plot(data2, pen="b")
-        self.curve_1 = p1.plot(np.linspace(0, len(data2), len(data2)+1), data2, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
+        # self.curve_1 = p1.plot(np.linspace(10, len(data2), len(data2)+1), data2, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
+        self.curve_1 = p1.plot(np.linspace(10, len(data2), len(data2)), data2, stepMode=False, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
 
         # 设置选区初始范围
         region.setRegion([250, 350])
