@@ -26,8 +26,7 @@ class image_flag:
     sim_flag    = 0 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
-    clear_store_flag = 0 # 清零存储数据开关
-    clear_board_flag = 1 # 清零电路板数据开关
+    clear_flag  = 0 # 清零数据开关
     info_string = ['zero']  # 返回的信息
 
 class image_control:
@@ -43,7 +42,7 @@ class image_control:
     
     # 清零全部数据
     def clear_data():
-        image_flag.clear_store_flag = 1
+        image_flag.clear_flag = 1
         print('数据已全部清零')
 
     # 更新状态信息
@@ -235,12 +234,7 @@ class MplWidget(QtWidgets.QWidget):
         # 实际测试
         if image_flag.sim_flag == 0:
             # self.multi_thread()
-            # 清零电路板数据
-            if image_flag.clear_board_flag == 1:
-                ser.write(cmd_query_data_and_param_and_clear)
-                image_flag.clear_board_flag = 0
-            else:
-                ser.write(cmd_query_data_and_param)
+            ser.write(cmd_query_data_and_param)
             recv = ser.read(10240).hex()
             # print(recv)
             parsed = collect_data.parse_signal_and_params(recv)
@@ -258,12 +252,14 @@ class MplWidget(QtWidgets.QWidget):
             self.curve_1.setData(data1)
             self.curve_2.setData(data1)
         # 清零图像并停止采集
-        if image_flag.clear_store_flag == 1:
+        if image_flag.clear_flag == 1:
+            # 清零电路板数据
+            ser.write(cmd_query_data_and_param_and_clear)
+            # 清零软件存储数据
             data1 = np.zeros(1000)
             self.curve_1.setData(data1)
             self.curve_2.setData(data1)
-            image_flag.clear_board_flag = 1
-            image_flag.clear_store_flag = 0
+            image_flag.clear_flag = 0
             image_flag.start_flag = 0
 
 '''
