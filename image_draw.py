@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
-LastEditTime : 2020-08-27 22:04:03
+LastEditTime : 2020-12-05 16:04:03
 LastEditors  : velvet
 Description  : 
 '''
@@ -83,11 +83,11 @@ if image_flag.sim_flag == 0:
     time_out = 1
     port_list = list(serial.tools.list_ports.comports())
     # 输入端口序号
-    # for i in range(len(port_list)):
-        # print(i, '---', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-    # COM_NUM = input('Please input an order number to choose a COM:')
-    # ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
-    ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out)
+    for i in range(len(port_list)):
+        print('序号：', i, '---', '端口COM：', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
+    COM_NUM = input('请输入序号来选择端口COM:')
+    ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
+    # ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out) # 直接选取默认端口
     # cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
     cmd_query_data = bytes.fromhex('01 0x32 00 00 33') # 查询数据修改
     cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
