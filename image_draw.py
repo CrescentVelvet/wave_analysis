@@ -79,15 +79,15 @@ ptr = 0
 
 if image_flag.sim_flag == 0:
     print("现在是实际测试")
-    bps = 115200
+    bps = 57600
     time_out = 1
     port_list = list(serial.tools.list_ports.comports())
     # 输入端口序号
     for i in range(len(port_list)):
         print('序号：', i, '---', '端口COM：', serial.Serial(list(port_list[i])[0], bps, timeout=time_out).name)
-    COM_NUM = input('请输入序号来选择端口COM:')
-    ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
-    # ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out) # 直接选取默认端口
+    # COM_NUM = input('请输入序号来选择端口COM:')
+    # ser = serial.Serial(list(port_list[COM_NUM])[0], bps, timeout=time_out)
+    ser = serial.Serial(list(port_list[0])[0], bps, timeout=time_out) # 直接选取默认端口
     # cmd_query_data = bytes.fromhex('fa f5 01 02 00 00 0e fe') # 查询数据
     cmd_query_data = bytes.fromhex('01 32 00 00 33') # 查询数据修改
     cmd_query_param = bytes.fromhex('fa f5 01 01 00 00 0f fe') # 查询参数
@@ -95,6 +95,7 @@ if image_flag.sim_flag == 0:
     cmd_disable_MCA = bytes.fromhex('fa f5 02 00 00 00 0f fe') # disable_MCA
     # cmd_query_data_and_clear = bytes.fromhex('fa f5 02 02 00 00 0d fe') # 查询数据并清零
     cmd_query_data_and_clear = bytes.fromhex('01 33 00 00 34') # 查询数据并清零修改
+    # 命令需要再次核对
     cmd_query_data_and_param = bytes.fromhex('fa f5 03 02 00 00 0c fe') # 查询数据和参数
     cmd_query_data_and_param_and_clear = bytes.fromhex('fa f5 04 02 00 00 0b fe') # 查询数据和参数并清零数据
     
@@ -236,9 +237,9 @@ class MplWidget(QtWidgets.QWidget):
         # 实际测试
         if image_flag.sim_flag == 0:
             # self.multi_thread()
-            ser.write(cmd_query_data_and_param)
+            ser.write(cmd_query_data)
             recv = ser.read(10240).hex()
-            # print(recv)
+            print("recv:", recv)
             parsed = collect_data.parse_signal_and_params(recv)
             for item in parsed.keys():
                 if item is not 'DATA':
