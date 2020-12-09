@@ -38,10 +38,18 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.startButton.clicked.connect(self.startButton_callback)
         self.stopButton.clicked.connect(self.stopButton_callback)
         self.clearButton.clicked.connect(self.clearButton_callback)
+        # 主界面菜单栏上的按钮触发开始采集、停止采集、数据清零函数的进程
+        self.action_start.triggered.connect(self.startButton_callback)
+        self.action_pause.triggered.connect(self.stopButton_callback)
+        self.action_stop.triggered.connect(self.clearButton_callback)
         # 主界面菜单栏上的帮助与更多选项跳转到信息介绍窗口
         self.action_QT.triggered.connect(self.QT_callback)
         self.action_PYQT.triggered.connect(self.PYQT_callback)
         self.action_ZJU.triggered.connect(self.ZJU_callback)
+        # 主界面菜单栏上的打开保存另存为与退出按钮
+        self.action_open.triggered.connect(self.open_callback)
+        self.action_save.triggered.connect(self.save_callback)
+        self.action_saveas.triggered.connect(self.saveas_callback)
         self.action_exit.triggered.connect(app.quit)
         # 选择目录按钮下面的文件栏
         self.tableWidget.setHorizontalHeaderLabels(['filename'])
@@ -128,6 +136,15 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             row = self.tableWidget.rowCount()
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
+
+    def open_callback(self):
+        self.textEdit.append('文件打开')
+
+    def save_callback(self):
+        self.textEdit.append('文件保存')
+
+    def saveas_callback(self):
+        self.textEdit.append('文件另存为')
 
 # class my_threading(threading.Thread):
 #     def __init__(self, ID, name, counter):

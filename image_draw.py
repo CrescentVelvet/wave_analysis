@@ -23,7 +23,7 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 0 # 仿真测试开关
+    sim_flag    = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
@@ -173,7 +173,7 @@ class DrawPicture(object):
             if index > minX and index < maxX:
                 label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1d,\t  <span style='color: purple'>y=%6.1d,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (int(mousePoint.x()), int(mousePoint.y()), int(image_flag.data1[index])))
             # print(image_flag.data1)
-            print(mouse_x, "---", index, "---", image_flag.data1[index])
+            # print(mouse_x, "---", index, "---", image_flag.data1[index])
             # # 当前日期时间————失败：与label_data无法在同一个layout上
             # time_data = datetime.datetime.now()
             # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
