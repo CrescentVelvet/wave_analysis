@@ -120,29 +120,30 @@ def save_file(dictt, filename="example.xml"):
         # print('OK')
 
 def load_file(filename="example.xml"):
-    dom = xml.dom.minidom.parse('example.xml')
+    # with open(filename,'r',encoding='utf8') as fh:
+    dom = xml.dom.minidom.parse(filename)
     root = dom.documentElement  
     return {
         'HEAD': root.getElementsByTagName('HEAD')[0].firstChild.data,
         'DATA': [int(node.firstChild.data) for node in root.getElementsByTagName('item')],
-        'GAIN_0': root.getElementsByTagName('GAIN_0')[0].firstChild.data,
-        'GAIN_1': root.getElementsByTagName('GAIN_1')[0].firstChild.data,
-        'VOL': root.getElementsByTagName('VOL')[0].firstChild.data,
-        'VOH': root.getElementsByTagName('VOH')[0].firstChild.data,
-        'M_T': root.getElementsByTagName('M_T')[0].firstChild.data,
-        'COUNT': root.getElementsByTagName('COUNT')[0].firstChild.data,
-        'MODE': root.getElementsByTagName('MODE')[0].firstChild.data,
-        'SOURCE': root.getElementsByTagName('SOURCE')[0].firstChild.data,
-        'RESERVE': root.getElementsByTagName('RESERVE')[0].firstChild.data,
-        'SN': root.getElementsByTagName('SN')[0].firstChild.data,
-        'ver': root.getElementsByTagName('ver')[0].firstChild.data,
-        'HOUR': root.getElementsByTagName('HOUR')[0].firstChild.data,
-        'MIN': root.getElementsByTagName('MIN')[0].firstChild.data,
-        'SEC': root.getElementsByTagName('SEC')[0].firstChild.data,
-        'YR': root.getElementsByTagName('YR')[0].firstChild.data,
-        'MON': root.getElementsByTagName('MON')[0].firstChild.data,
-        'DAY': root.getElementsByTagName('DAY')[0].firstChild.data,
-        'WD': root.getElementsByTagName('WD')[0].firstChild.data,
+        # 'GAIN_0': root.getElementsByTagName('GAIN_0')[0].firstChild.data,
+        # 'GAIN_1': root.getElementsByTagName('GAIN_1')[0].firstChild.data,
+        # 'VOL': root.getElementsByTagName('VOL')[0].firstChild.data,
+        # 'VOH': root.getElementsByTagName('VOH')[0].firstChild.data,
+        # 'M_T': root.getElementsByTagName('M_T')[0].firstChild.data,
+        # 'COUNT': root.getElementsByTagName('COUNT')[0].firstChild.data,
+        # 'MODE': root.getElementsByTagName('MODE')[0].firstChild.data,
+        # 'SOURCE': root.getElementsByTagName('SOURCE')[0].firstChild.data,
+        # 'RESERVE': root.getElementsByTagName('RESERVE')[0].firstChild.data,
+        # 'SN': root.getElementsByTagName('SN')[0].firstChild.data,
+        # 'ver': root.getElementsByTagName('ver')[0].firstChild.data,
+        # 'HOUR': root.getElementsByTagName('HOUR')[0].firstChild.data,
+        # 'MIN': root.getElementsByTagName('MIN')[0].firstChild.data,
+        # 'SEC': root.getElementsByTagName('SEC')[0].firstChild.data,
+        # 'YR': root.getElementsByTagName('YR')[0].firstChild.data,
+        # 'MON': root.getElementsByTagName('MON')[0].firstChild.data,
+        # 'DAY': root.getElementsByTagName('DAY')[0].firstChild.data,
+        # 'WD': root.getElementsByTagName('WD')[0].firstChild.data,
     }
 
 '''

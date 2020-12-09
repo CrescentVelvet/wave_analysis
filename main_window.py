@@ -11,7 +11,7 @@ import numpy as np
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from ui_window import Ui_MainWindow
-from image_draw import image_control
+import image_draw
 import os
 import matplotlib.pyplot as plt
 from pylab import *
@@ -22,6 +22,7 @@ import datetime
 import asyncio
 import threading
 import queue
+import collect_data
 
 '''
 description: 主界面窗口
@@ -64,21 +65,21 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.button_Browse.setEnabled(False)
-        image_control.start_to_collect()
+        image_draw.image_control.start_to_collect()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
         self.textEdit.append(time_str)
         # 输出信息
-        self.textEdit.append(image_control.update_info())
+        self.textEdit.append(image_draw.image_control.update_info())
         self.textEdit.append('开始采集数据')
 
     # 停止按钮
     def stopButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.button_Browse.setEnabled(False)
-        image_control.stop_to_collect()
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.stop_to_collect()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
@@ -90,8 +91,8 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def clearButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.button_Browse.setEnabled(False)
-        image_control.clear_data()
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.clear_data()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
@@ -122,12 +123,13 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def browse_callback(self):
         # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
+        self.textEdit.append('文件保存')
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
         self.tableWidget.clearContents()
         self.tableWidget.setRowCount(0)
         self.line_Directory.setText(directory)
+        dataname = ""
         dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
-
         while(dirIterator.hasNext()):
             dirIterator.next()
             dataname = dirIterator.filePath()
@@ -136,12 +138,44 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             row = self.tableWidget.rowCount()
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
+        ddaattaa = dict(image_draw.image_flag.parsed)
+        print(ddaattaa)
+        collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
 
     def open_callback(self):
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.stop_to_collect()
         self.textEdit.append('文件打开')
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None,"标题",".","*.xml")
+        parsed = collect_data.load_file(file_name[0])
+        print(parsed)
+        image_draw.image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
+        image_draw.image_control.draw_once_data()
+
+
 
     def save_callback(self):
+        # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
         self.textEdit.append('文件保存')
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
+        self.tableWidget.clearContents()
+        self.tableWidget.setRowCount(0)
+        self.line_Directory.setText(directory)
+        dataname = ""
+        dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
+        while(dirIterator.hasNext()):
+            dirIterator.next()
+            dataname = dirIterator.filePath()
+            name = QtWidgets.QTableWidgetItem(dataname)
+            analysis = QtWidgets.QTableWidgetItem('Not Yet')
+            row = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(row)
+            self.tableWidget.setItem(row, 0, name)
+        ddaattaa = image_draw.image_flag.parsed
+        print(ddaattaa)
+        collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
 
     def saveas_callback(self):
         self.textEdit.append('文件另存为')
