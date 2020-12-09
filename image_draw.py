@@ -23,7 +23,7 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 1 # 仿真测试开关
+    sim_flag    = 0 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
