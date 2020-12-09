@@ -23,7 +23,7 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 0 # 仿真测试开关
+    sim_flag    = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
@@ -168,10 +168,12 @@ class DrawPicture(object):
             elif mouse_x < 0:
                 mouse_x = 0
                 print("已超出边界")
-            index = int( (mouse_x-0) / (len(image_flag.data1)-0) * (maxX - minX) + minX )
+            # index = int( (mouse_x-0) / (len(image_flag.data1)-0) * (maxX - minX) + minX )
+            index = int(mouse_x)
             if index > minX and index < maxX:
                 label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1d,\t  <span style='color: purple'>y=%6.1d,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (int(mousePoint.x()), int(mousePoint.y()), int(image_flag.data1[index])))
             # print(image_flag.data1)
+            print(mouse_x, "---", index, "---", image_flag.data1[index])
             # # 当前日期时间————失败：与label_data无法在同一个layout上
             # time_data = datetime.datetime.now()
             # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
@@ -201,11 +203,7 @@ class MplWidget(QtWidgets.QWidget):
             elif (i+1) % 10 == 0 or i == len(image_flag.data1)-1:
                 data2[i//10] /= avg_flag
                 avg_flag = 0
-        # 绘制折线图
-        # self.curve_1 = p1.plot(data1, pen="b")
-        self.curve_2 = p2.plot(image_flag.data1, pen="y")
-        # self.curve_2 = p2.plot(data2, pen="y")
-        # 绘制直方图
+        # 绘制直方图(上图)
         # np.histogram处理累计数据
         # hist, bin_edges = np.histogram(data1, bins=len(data1))
         # self.curve_1 = p1.plot(bin_edges, hist, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
@@ -213,6 +211,8 @@ class MplWidget(QtWidgets.QWidget):
         # self.curve_1 = p1.plot(data2, pen="b")
         # self.curve_1 = p1.plot(np.linspace(10, len(data2), len(data2)+1), data2, stepMode=True, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
         self.curve_1 = p1.plot(np.linspace(10, len(data2), len(data2)), data2, stepMode=False, fillLevel=0, fillOutline=True, brush=(0,0,255,150))
+        # 绘制折线图(下图)
+        self.curve_2 = p2.plot(image_flag.data1, pen="y")
 
         # 设置选区初始范围
         region.setRegion([250, 350])
