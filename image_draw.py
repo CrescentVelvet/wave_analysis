@@ -28,6 +28,7 @@ class image_flag:
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
     info_string = ['zero']  # 返回的信息
+    data1 = np.zeros(1000)  # 保存静态数据
 
 class image_control:
     # 开始采集数据
@@ -71,9 +72,6 @@ region = pg.LinearRegionItem()
 # 显示鼠标十字线
 vLine = pg.InfiniteLine(angle=90, movable=False)
 hLine = pg.InfiniteLine(angle=0, movable=False)
-# 添加随机数据
-# data1 = 1500 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-data1 = np.zeros(1000)
 vb = p1.vb
 ptr = 0
 
@@ -159,10 +157,21 @@ class DrawPicture(object):
             mouse_x = int(mousePoint.x())
             # 获取上图选区范围
             minX, maxX = region.getRegion()
+            # 边界检测
+            if maxX > 1000 or minX < 0:
+                maxX = 1000
+                minX = 0
             # 将鼠标坐标映射到上图并取整
-            index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
+            if mouse_x > 1000:
+                mouse_x = 1000
+                print("已超出边界")
+            elif mouse_x < 0:
+                mouse_x = 0
+                print("已超出边界")
+            index = int( (mouse_x-0) / (len(image_flag.data1)-0) * (maxX - minX) + minX )
             if index > minX and index < maxX:
-                label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: purple'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
+                label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1d,\t  <span style='color: purple'>y=%6.1d,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (int(mousePoint.x()), int(mousePoint.y()), int(image_flag.data1[index])))
+            # print(image_flag.data1)
             # # 当前日期时间————失败：与label_data无法在同一个layout上
             # time_data = datetime.datetime.now()
             # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
@@ -183,18 +192,18 @@ class MplWidget(QtWidgets.QWidget):
         p2.addItem(region, ignoreBounds=True)
         p1.setAutoVisible(y=True)
         # 减少数据量，相邻数据取平均
-        data2 = np.zeros(len(data1)//10)
+        data2 = np.zeros(len(image_flag.data1)//10)
         avg_flag = 0
-        for i in range(len(data1)):
-            data2[i//10] += data1[i]
+        for i in range(len(image_flag.data1)):
+            data2[i//10] += image_flag.data1[i]
             if (i+1) % 10 != 0:
                 avg_flag += 1
-            elif (i+1) % 10 == 0 or i == len(data1)-1:
+            elif (i+1) % 10 == 0 or i == len(image_flag.data1)-1:
                 data2[i//10] /= avg_flag
                 avg_flag = 0
         # 绘制折线图
         # self.curve_1 = p1.plot(data1, pen="b")
-        self.curve_2 = p2.plot(data1, pen="y")
+        self.curve_2 = p2.plot(image_flag.data1, pen="y")
         # self.curve_2 = p2.plot(data2, pen="y")
         # 绘制直方图
         # np.histogram处理累计数据
@@ -233,7 +242,7 @@ class MplWidget(QtWidgets.QWidget):
         image_flag.info_string[0] = '————————'
         global p1, ptr, ser, cmd_query_data, cmd_query_data_and_clear, cmd_query_data_and_param_and_clear, cmd_query_data_and_param
         # 更新随机数据
-        data1 = np.zeros(1000)
+        # data1 = np.zeros(1000)
         # 实际测试
         if image_flag.sim_flag == 0:
             # self.multi_thread()
@@ -245,25 +254,39 @@ class MplWidget(QtWidgets.QWidget):
                 if item is not 'DATA':
                     image_flag.info_string.append(parsed[item])
             # print(parsed)
-            data1 = np.array(parsed['DATA'], dtype=np.int64)
+            image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
         # 仿真测试
         elif image_flag.sim_flag == 1:
             # data1 = 1000 * pg.gaussianFilter(np.random.random(size=1000), 10) + 300 * np.random.random(size=1000)
-            data1 = 300 * np.random.random(size=1000)
+            if image_flag.start_flag == 1:
+                image_flag.data1 = 300 * np.random.random(size=1000)
         # 绘制图像并开始采集
         if image_flag.start_flag == 1:
-            self.curve_1.setData(data1)
-            self.curve_2.setData(data1)
+            self.curve_1.setData(image_flag.data1)
+            self.curve_2.setData(image_flag.data1)
         # 清零图像并停止采集
         if image_flag.clear_flag == 1:
             # 清零电路板数据
-            ser.write(cmd_query_data_and_param_and_clear)
+            if image_flag.sim_flag == 0:
+                ser.write(cmd_query_data_and_param_and_clear)
             # 清零软件存储数据
-            data1 = np.zeros(1000)
-            self.curve_1.setData(data1)
-            self.curve_2.setData(data1)
+            image_flag.data1 = np.zeros(1000)
+            self.curve_1.setData(image_flag.data1)
+            self.curve_2.setData(image_flag.data1)
             image_flag.clear_flag = 0
             image_flag.start_flag = 0
+
+
+        # 更新label数据（当前道数与总道数）
+
+        # minX, maxX = region.getRegion()
+        # mouse_x = int(mousePoint.x())
+        # # 将鼠标坐标映射到上图并取整
+        # index = int( (mouse_x-0) / (len(data1)-0) * (maxX - minX) + minX )
+        # if index > minX and index < maxX:
+        #     label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1f,\t  <span style='color: purple'>y=%6.1f,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (mousePoint.x(), mousePoint.y(), int(data1[index])))
+        #     print(data1)
+        # print(minX)
 
 '''
 description: 多线程的失败尝试

@@ -50,8 +50,8 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.setReadOnly(True)
         # 点击选择目录按钮打开文件
         self.button_Browse.clicked.connect(self.browse_callback)
-        
 
+    # 开始按钮
     def startButton_callback(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
@@ -65,6 +65,7 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.append(image_control.update_info())
         self.textEdit.append('开始采集数据')
 
+    # 停止按钮
     def stopButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -76,7 +77,8 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.append(time_str)
         # 输出信息
         self.textEdit.append('停止采集数据')
-    
+
+    # 清零按钮
     def clearButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
