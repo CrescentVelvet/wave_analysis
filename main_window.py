@@ -58,7 +58,7 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.line_Directory.setReadOnly(True)
         self.textEdit.setReadOnly(True)
         # 点击选择目录按钮打开文件
-        self.button_Browse.clicked.connect(self.browse_callback)
+        self.button_Browse.clicked.connect(self.open_callback)
 
     # 开始按钮
     def startButton_callback(self):
@@ -120,27 +120,6 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 设置帮助菜单中的关于浙江大学的信息介绍
         QMessageBox.about(self, 'About ZJU', '<p>866 Yuhangtang Rd, Hangzhou 310058, P.R. China&nbsp;</p><p>Copyright &copy; '
             + ' 2020 <a href="http://www.zju.edu.cn/" target="_blank">Zhejiang University</a>&nbsp;</p><p>Seeking Truth, Pursuing Innovation.</p>')
-    
-    def browse_callback(self):
-        # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
-        self.textEdit.append('文件保存')
-        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
-        self.tableWidget.clearContents()
-        self.tableWidget.setRowCount(0)
-        self.line_Directory.setText(directory)
-        dataname = ""
-        dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
-        while(dirIterator.hasNext()):
-            dirIterator.next()
-            dataname = dirIterator.filePath()
-            name = QtWidgets.QTableWidgetItem(dataname)
-            analysis = QtWidgets.QTableWidgetItem('Not Yet')
-            row = self.tableWidget.rowCount()
-            self.tableWidget.insertRow(row)
-            self.tableWidget.setItem(row, 0, name)
-        ddaattaa = dict(image_draw.image_flag.parsed)
-        print(ddaattaa)
-        collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
 
     # 选择文件夹打开文件绘制图像
     def open_callback(self):
@@ -151,7 +130,7 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.append('文件打开')
         file_name = QtWidgets.QFileDialog.getOpenFileName(None,"标题",".","*.xml")
         parsed = collect_data.load_file(file_name[0])
-        print(parsed)
+        # print(parsed)
         image_draw.image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
         image_draw.image_control.draw_once_data()
 
