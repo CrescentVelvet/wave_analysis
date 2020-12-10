@@ -1,4 +1,4 @@
-'''
+﻿'''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
 LastEditTime : 2020-12-05 16:04:03
@@ -23,7 +23,7 @@ import threading
 import queue
 
 class image_flag:
-    sim_flag    = 0 # 仿真测试开关
+    sim_flag    = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
@@ -273,10 +273,9 @@ class MplWidget(QtWidgets.QWidget):
                 if item is not 'DATA':
                     image_flag.info_string.append(parsed[item])
             # print(parsed)
-            image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
-            if image_flag.start_flag == 1 or image_flag.draw_once == 2:
+            # image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
+            if image_flag.start_flag == 1:
                 image_flag.data1 = 300 * np.random.random(size=1000)
-                image_flag.draw_once = 1
         # 绘制图像并开始采集
         if image_flag.start_flag == 1 or image_flag.draw_once == 1:
             self.curve_1.setData(image_flag.data1)

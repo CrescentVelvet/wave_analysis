@@ -78,7 +78,7 @@ return: dict()
 '''
 def parse_signal_and_params(datas):
     HEAD = datas[:12]
-    print(HEAD)
+    # print(HEAD)
     # if HEAD != 'FAF503824010'.lower() and HEAD != 'FAF504824810'.lower():# 前一个是查询数据和参数，后一个是查询数据和参数并清零数据
     #     print('parse_param error!!!')
     #     return {}

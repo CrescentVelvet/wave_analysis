@@ -142,6 +142,7 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(ddaattaa)
         collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
 
+    # 选择文件夹打开文件绘制图像
     def open_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -153,8 +154,6 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         print(parsed)
         image_draw.image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
         image_draw.image_control.draw_once_data()
-
-
 
     def save_callback(self):
         # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
