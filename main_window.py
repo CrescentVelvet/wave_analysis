@@ -52,6 +52,9 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.action_save.triggered.connect(self.save_callback)
         self.action_saveas.triggered.connect(self.saveas_callback)
         self.action_exit.triggered.connect(app.quit)
+        # 主界面菜单栏上的波特率设置按钮
+        self.action_57600.triggered.connect(self.setbps_57600_callback)
+        self.action_115200.triggered.connect(self.setbps_115200_callback)
         # 选择目录按钮下面的文件栏
         self.tableWidget.setHorizontalHeaderLabels(['filename'])
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
@@ -99,6 +102,25 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit.append(time_str)
         # 输出信息
         self.textEdit.append('数据已全部清零')
+
+    # 设置波特率按钮
+    def setbps_57600_callback(self):
+        image_draw.image_flag.bps = 57600
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
+        self.textEdit.append('设置波特率为57600')
+
+    def setbps_115200_callback(self):
+        image_draw.image_flag.bps = 115200
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
+        self.textEdit.append('设置波特率为115200')
 
     def QT_callback(self):
         # 设置帮助菜单中的关于QT的信息介绍
