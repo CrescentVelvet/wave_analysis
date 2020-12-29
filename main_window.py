@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:38:06
-LastEditTime : 2020-08-27 20:50:53
+LastEditTime : 2020-12-29 11:48:00
 LastEditors  : velvet
 Description  : 
 '''
@@ -11,7 +11,7 @@ import numpy as np
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from ui_window import Ui_MainWindow
-from image_draw import image_control
+import image_draw
 import os
 import matplotlib.pyplot as plt
 from pylab import *
@@ -22,6 +22,7 @@ import datetime
 import asyncio
 import threading
 import queue
+import collect_data
 
 '''
 description: 主界面窗口
@@ -38,39 +39,50 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.startButton.clicked.connect(self.startButton_callback)
         self.stopButton.clicked.connect(self.stopButton_callback)
         self.clearButton.clicked.connect(self.clearButton_callback)
+        # 主界面菜单栏上的按钮触发开始采集、停止采集、数据清零函数的进程
+        self.action_start.triggered.connect(self.startButton_callback)
+        self.action_pause.triggered.connect(self.stopButton_callback)
+        self.action_stop.triggered.connect(self.clearButton_callback)
         # 主界面菜单栏上的帮助与更多选项跳转到信息介绍窗口
         self.action_QT.triggered.connect(self.QT_callback)
         self.action_PYQT.triggered.connect(self.PYQT_callback)
-        self.action_ZJU.triggered.connect(self.ZJU_callback)
+        # self.action_ZJU.triggered.connect(self.ZJU_callback)
+        # 主界面菜单栏上的打开保存另存为与退出按钮
+        self.action_open.triggered.connect(self.open_callback)
+        self.action_save.triggered.connect(self.save_callback)
+        self.action_saveas.triggered.connect(self.saveas_callback)
         self.action_exit.triggered.connect(app.quit)
+        # 主界面菜单栏上的波特率设置按钮
+        self.action_57600.triggered.connect(self.setbps_57600_callback)
+        self.action_115200.triggered.connect(self.setbps_115200_callback)
         # 选择目录按钮下面的文件栏
         self.tableWidget.setHorizontalHeaderLabels(['filename'])
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.line_Directory.setReadOnly(True)
         self.textEdit.setReadOnly(True)
         # 点击选择目录按钮打开文件
-        self.button_Browse.clicked.connect(self.browse_callback)
+        self.button_Browse.clicked.connect(self.open_callback)
 
     # 开始按钮
     def startButton_callback(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.button_Browse.setEnabled(False)
-        image_control.start_to_collect()
+        image_draw.image_control.start_to_collect()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
         self.textEdit.append(time_str)
         # 输出信息
-        self.textEdit.append(image_control.update_info())
+        self.textEdit.append(image_draw.image_control.update_info())
         self.textEdit.append('开始采集数据')
 
     # 停止按钮
     def stopButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.button_Browse.setEnabled(False)
-        image_control.stop_to_collect()
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.stop_to_collect()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
@@ -82,14 +94,33 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def clearButton_callback(self):
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.button_Browse.setEnabled(False)
-        image_control.clear_data()
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.clear_data()
         # 输出当前时间
         time_data = datetime.datetime.now()
         time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
         self.textEdit.append(time_str)
         # 输出信息
         self.textEdit.append('数据已全部清零')
+
+    # 设置波特率按钮
+    def setbps_57600_callback(self):
+        image_draw.image_flag.bps = 57600
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
+        self.textEdit.append('设置波特率为57600')
+
+    def setbps_115200_callback(self):
+        image_draw.image_flag.bps = 115200
+        # 输出当前时间
+        time_data = datetime.datetime.now()
+        time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
+        self.textEdit.append(time_str)
+        # 输出信息
+        self.textEdit.append('设置波特率为115200')
 
     def QT_callback(self):
         # 设置帮助菜单中的关于QT的信息介绍
@@ -111,15 +142,49 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # 设置帮助菜单中的关于浙江大学的信息介绍
         QMessageBox.about(self, 'About ZJU', '<p>866 Yuhangtang Rd, Hangzhou 310058, P.R. China&nbsp;</p><p>Copyright &copy; '
             + ' 2020 <a href="http://www.zju.edu.cn/" target="_blank">Zhejiang University</a>&nbsp;</p><p>Seeking Truth, Pursuing Innovation.</p>')
-    
-    def browse_callback(self):
+
+    # 选择文件夹打开文件绘制图像
+    def open_callback(self):
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.button_Browse.setEnabled(True)
+        image_draw.image_control.stop_to_collect()
+        self.textEdit.append('文件打开')
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None,"标题",".","*.xml")
+        parsed = collect_data.load_file(file_name[0])
+        # print(parsed)
+        image_draw.image_flag.data1 = np.array(parsed['DATA'], dtype=np.int64)
+        image_draw.image_control.draw_once_data()
+
+    def save_callback(self):
         # 选择文件夹后将文件夹中所有的" .txt" 文件列出来
+        self.textEdit.append('文件保存')
+        # directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
+        # self.tableWidget.clearContents()
+        # self.tableWidget.setRowCount(0)
+        # self.line_Directory.setText(directory)
+        # dataname = ""
+        # dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
+        # while(dirIterator.hasNext()):
+        #     dirIterator.next()
+        #     dataname = dirIterator.filePath()
+        #     name = QtWidgets.QTableWidgetItem(dataname)
+        #     analysis = QtWidgets.QTableWidgetItem('Not Yet')
+        #     row = self.tableWidget.rowCount()
+        #     self.tableWidget.insertRow(row)
+        #     self.tableWidget.setItem(row, 0, name)
+        ddaattaa = image_draw.image_flag.parsed
+        print(ddaattaa)
+        collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
+
+    def saveas_callback(self):
+        self.textEdit.append('文件另存为')
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
         self.tableWidget.clearContents()
         self.tableWidget.setRowCount(0)
         self.line_Directory.setText(directory)
+        dataname = ""
         dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
-
         while(dirIterator.hasNext()):
             dirIterator.next()
             dataname = dirIterator.filePath()
@@ -128,6 +193,9 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             row = self.tableWidget.rowCount()
             self.tableWidget.insertRow(row)
             self.tableWidget.setItem(row, 0, name)
+        ddaattaa = image_draw.image_flag.parsed
+        print(ddaattaa)
+        collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
 
 # class my_threading(threading.Thread):
 #     def __init__(self, ID, name, counter):
@@ -157,10 +225,10 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     t = QtCore.QElapsedTimer()
     t.start()
-    splash = QtWidgets.QSplashScreen(QtGui.QPixmap("logo.jpg"))
-    while t.elapsed() < 1000:
-        splash.show()
-    splash.finish(splash)
+    # splash = QtWidgets.QSplashScreen(QtGui.QPixmap("logo.jpg"))
+    # while t.elapsed() < 1000:
+        # splash.show()
+    # splash.finish(splash)
     MultiChannel_window = DesignerMainWindow()
     MultiChannel_window.show()
 

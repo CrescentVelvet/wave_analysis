@@ -1,7 +1,7 @@
 '''
 Author       : velvet
 Date         : 2020-08-07 22:35:47
-LastEditTime : 2020-12-06 21:05:32
+LastEditTime : 2020-12-29 10:49:11
 LastEditors  : velvet
 Description  : 
 '''
@@ -77,16 +77,16 @@ param: str()
 return: dict()
 '''
 def parse_signal_and_params(datas):
-    HEAD = datas[:12]
-    print(HEAD)
+    HEAD = datas[:8]
+    # print(HEAD)
     # if HEAD != 'FAF503824010'.lower() and HEAD != 'FAF504824810'.lower():# 前一个是查询数据和参数，后一个是查询数据和参数并清零数据
     #     print('parse_param error!!!')
     #     return {}
     signal = []
     for i in range(0,1024):
-        signal.append(eval('0x' + datas[16+6*i: 18+6*i] + datas[14+6*i: 16+6*i] + datas[12+6*i: 14+6*i]))
+        signal.append(eval('0x' + datas[12+6*i: 14+6*i] + datas[10+6*i: 12+6*i] + datas[8+6*i: 10+6*i]))
         # print(datas[12+6*i: 18+6*i][::-1])
-    params = HEAD + datas[18+6*1024:]
+    params = HEAD + datas[14+6*1024:]
     return {
         'HEAD': HEAD,
         'DATA': signal,
@@ -120,29 +120,30 @@ def save_file(dictt, filename="example.xml"):
         # print('OK')
 
 def load_file(filename="example.xml"):
-    dom = xml.dom.minidom.parse('example.xml')
+    # with open(filename,'r',encoding='utf8') as fh:
+    dom = xml.dom.minidom.parse(filename)
     root = dom.documentElement  
     return {
         'HEAD': root.getElementsByTagName('HEAD')[0].firstChild.data,
         'DATA': [int(node.firstChild.data) for node in root.getElementsByTagName('item')],
-        'GAIN_0': root.getElementsByTagName('GAIN_0')[0].firstChild.data,
-        'GAIN_1': root.getElementsByTagName('GAIN_1')[0].firstChild.data,
-        'VOL': root.getElementsByTagName('VOL')[0].firstChild.data,
-        'VOH': root.getElementsByTagName('VOH')[0].firstChild.data,
-        'M_T': root.getElementsByTagName('M_T')[0].firstChild.data,
-        'COUNT': root.getElementsByTagName('COUNT')[0].firstChild.data,
-        'MODE': root.getElementsByTagName('MODE')[0].firstChild.data,
-        'SOURCE': root.getElementsByTagName('SOURCE')[0].firstChild.data,
-        'RESERVE': root.getElementsByTagName('RESERVE')[0].firstChild.data,
-        'SN': root.getElementsByTagName('SN')[0].firstChild.data,
-        'ver': root.getElementsByTagName('ver')[0].firstChild.data,
-        'HOUR': root.getElementsByTagName('HOUR')[0].firstChild.data,
-        'MIN': root.getElementsByTagName('MIN')[0].firstChild.data,
-        'SEC': root.getElementsByTagName('SEC')[0].firstChild.data,
-        'YR': root.getElementsByTagName('YR')[0].firstChild.data,
-        'MON': root.getElementsByTagName('MON')[0].firstChild.data,
-        'DAY': root.getElementsByTagName('DAY')[0].firstChild.data,
-        'WD': root.getElementsByTagName('WD')[0].firstChild.data,
+        # 'GAIN_0': root.getElementsByTagName('GAIN_0')[0].firstChild.data,
+        # 'GAIN_1': root.getElementsByTagName('GAIN_1')[0].firstChild.data,
+        # 'VOL': root.getElementsByTagName('VOL')[0].firstChild.data,
+        # 'VOH': root.getElementsByTagName('VOH')[0].firstChild.data,
+        # 'M_T': root.getElementsByTagName('M_T')[0].firstChild.data,
+        # 'COUNT': root.getElementsByTagName('COUNT')[0].firstChild.data,
+        # 'MODE': root.getElementsByTagName('MODE')[0].firstChild.data,
+        # 'SOURCE': root.getElementsByTagName('SOURCE')[0].firstChild.data,
+        # 'RESERVE': root.getElementsByTagName('RESERVE')[0].firstChild.data,
+        # 'SN': root.getElementsByTagName('SN')[0].firstChild.data,
+        # 'ver': root.getElementsByTagName('ver')[0].firstChild.data,
+        # 'HOUR': root.getElementsByTagName('HOUR')[0].firstChild.data,
+        # 'MIN': root.getElementsByTagName('MIN')[0].firstChild.data,
+        # 'SEC': root.getElementsByTagName('SEC')[0].firstChild.data,
+        # 'YR': root.getElementsByTagName('YR')[0].firstChild.data,
+        # 'MON': root.getElementsByTagName('MON')[0].firstChild.data,
+        # 'DAY': root.getElementsByTagName('DAY')[0].firstChild.data,
+        # 'WD': root.getElementsByTagName('WD')[0].firstChild.data,
     }
 
 '''

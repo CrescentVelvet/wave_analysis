@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+﻿# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -21,6 +21,13 @@ sdist/
 var/
 wheels/
 share/python-wheels/
+PyQt5/
+pyqtgraph/
+serial/
+numpy/
+matplotlib/
+dist/
+build/
 *.egg-info/
 .installed.cfg
 *.egg
