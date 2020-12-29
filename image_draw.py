@@ -1,4 +1,4 @@
-'''
+﻿'''
 Author       : velvet
 Date         : 2020-08-07 22:37:28
 LastEditTime : 2020-12-05 16:04:03
@@ -77,7 +77,8 @@ ptr = 0
 
 if image_flag.sim_flag == 0:
     print("现在是实际测试")
-    bps = 57600
+    # bps = 57600
+    bps = 115200
     time_out = 1
     port_list = list(serial.tools.list_ports.comports())
     # 输入端口序号
@@ -173,7 +174,7 @@ class DrawPicture(object):
             if index > minX and index < maxX:
                 label_data.setText("<span style='font-size: 12pt', span style='color: green'>x=%6.1d,\t  <span style='color: purple'>y=%6.1d,\t <span style='color: yellow'>当前道计数=%6.1d个</span>" % (int(mousePoint.x()), int(mousePoint.y()), int(image_flag.data1[index])))
             # print(image_flag.data1)
-            print(mouse_x, "---", index, "---", image_flag.data1[index])
+            # print(mouse_x, "---", index, "---", image_flag.data1[index])
             # # 当前日期时间————失败：与label_data无法在同一个layout上
             # time_data = datetime.datetime.now()
             # time_str = datetime.datetime.strftime(time_data,'%Y-%m-%d %H:%M:%S')
