@@ -28,3 +28,12 @@ ui_window中无法调用未实例化的绘图变量，在image_draw中设置为�
 ```sh
 pyinstaller -F -i .\logo.ico .\main_window.py
 ```
+
+## ubuntu环境配置
+
+```sh
+pip install pyqtgraph
+pip install serial --ignore-installed PyYAML
+pip install pyserial
+pip install dicttoxml
+```
