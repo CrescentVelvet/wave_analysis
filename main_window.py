@@ -56,12 +56,19 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.action_57600.triggered.connect(self.setbps_57600_callback)
         self.action_115200.triggered.connect(self.setbps_115200_callback)
         # 选择目录按钮下面的文件栏
-        self.tableWidget.setHorizontalHeaderLabels(['filename'])
-        self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.line_Directory.setReadOnly(True)
-        self.textEdit.setReadOnly(True)
+        # self.tableWidget.setHorizontalHeaderLabels(['filename'])
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        # self.line_Directory.setReadOnly(True)
+        # self.textEdit.setReadOnly(True)
         # 点击选择目录按钮打开文件
         self.button_Browse.clicked.connect(self.open_callback)
+        # 查看道数信息
+        self.edit_1.setText(str(image_draw.image_data.now_channel))
+        self.edit_2.setText(str(image_draw.image_data.now_data))
+        self.edit_3.setText(str(image_draw.image_data.all_channel))
+        self.edit_4.setText(str(image_draw.image_data.all_data))
+        self.edit_5.setText(str(image_draw.image_data.start_channel))
+        self.edit_6.setText(str(image_draw.image_data.end_channel))
 
     # 开始按钮
     def startButton_callback(self):
@@ -180,19 +187,19 @@ class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def saveas_callback(self):
         self.textEdit.append('文件另存为')
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Find Folder", QtCore.QDir.currentPath())
-        self.tableWidget.clearContents()
-        self.tableWidget.setRowCount(0)
-        self.line_Directory.setText(directory)
+        # self.tableWidget.clearContents()
+        # self.tableWidget.setRowCount(0)
+        # self.line_Directory.setText(directory)
         dataname = ""
         dirIterator = QtCore.QDirIterator(directory,  ['*.txt'])
-        while(dirIterator.hasNext()):
-            dirIterator.next()
-            dataname = dirIterator.filePath()
-            name = QtWidgets.QTableWidgetItem(dataname)
-            analysis = QtWidgets.QTableWidgetItem('Not Yet')
-            row = self.tableWidget.rowCount()
-            self.tableWidget.insertRow(row)
-            self.tableWidget.setItem(row, 0, name)
+        # while(dirIterator.hasNext()):
+        #     dirIterator.next()
+        #     dataname = dirIterator.filePath()
+        #     name = QtWidgets.QTableWidgetItem(dataname)
+        #     analysis = QtWidgets.QTableWidgetItem('Not Yet')
+        #     row = self.tableWidget.rowCount()
+        #     self.tableWidget.insertRow(row)
+        #     self.tableWidget.setItem(row, 0, name)
         ddaattaa = image_draw.image_flag.parsed
         print(ddaattaa)
         collect_data.save_file(ddaattaa, datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d_%H-%M-%S') + ".xml")
