@@ -22,8 +22,16 @@ import collect_data
 import threading
 import queue
 
+class image_data:
+    now_channel = 0 # 当前道数
+    now_data = 0 # 当前粒子计数
+    all_channel = 0 # 总道数
+    all_data = 0 # 总粒子计数
+    start_channel = 0 # 查看道数起点
+    end_channel = 0 # 查看道数终点
+
 class image_flag:
-    sim_flag    = 0 # 仿真测试开关
+    sim_flag    = 1 # 仿真测试开关
     thread_flag = 0 # 多线程开关
     start_flag  = 0 # 采集数据开关
     clear_flag  = 0 # 清零数据开关
@@ -171,6 +179,9 @@ class DrawPicture(object):
             if maxX > 1000 or minX < 0:
                 maxX = 1000
                 minX = 0
+            # 道数信息显示
+            image_data.start_channel = minX
+            image_data.end_channel = maxX
             # 将鼠标坐标映射到上图并取整
             if mouse_x > 1000:
                 mouse_x = 1000
